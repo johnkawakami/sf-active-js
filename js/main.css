@@ -1,0 +1,72 @@
+@import url(http://fonts.googleapis.com/css?family=Libre+Baskerville:400,400italic,700);
+
+span.icons {
+	float:right;
+	padding-right: 1.5em;
+}
+span.menu {
+	border: 1px dotted #66a;
+	padding: 5px;
+	margin: 5px;
+    margin-left: 2em;
+}
+    
+body {
+	padding: 0;
+	margin: 0;
+	font-family:  "Libre Baskerville";
+	color: #eee;
+	background-color: black;
+}
+.region {
+	margin: 0;
+	padding: 3pt;
+}
+#topbar {
+	position: fixed; top: 0; left: 0;
+	width: 100%;
+	height: 1.8em;
+	background-color: #612;
+	padding-left: 1em;
+	padding-right: 3em;
+	padding-top: 0.5em;
+}
+#content {
+	margin: 16pt;
+	height: 100%;
+}
+#bottombar {
+	height: 20px;
+	background-color: lightblue;
+}
+
+#heading {
+	font-weight: normal;
+	color: white;
+}
+#summary {
+	font-style: italic;
+}
+#author {
+	font-size: 90%;
+}
+#article {
+	line-height: 1.8em;
+}
+h2 {
+	font-weight: normal;
+}
+
+/* responsive section */
+@media screen and (min-width: 30em) {
+  #content {
+		width: 30em;
+		margin-left: auto;
+		margin-right: auto;
+  }
+	.videoPlayer {
+		width: 100%;
+
+	}
+}
+
