@@ -7,11 +7,11 @@ var layoutModule = function ($, EV, url) {
 	s.drawWidget();
 	
 	$('#topbar').append("<span class='menu'>breaking<img src='list.png' align='absmiddle' /></span>");
-	$('#topbar').append("<span class='menu'>local</span>");
+	$('#topbar').append("<span id='#local' class='menu'>local</span>");
 	$('#topbar').append("<span class='menu'>calendar</span>");
 	$('#topbar').append("<span class='menu'>features</span>");
 	$('#topbar').append("<span class='menu'><b>publish</b></span>");
-	
+
 	$.getJSON(url).done(function (data) {
 		insertStory( data.article );
 		insertComments( data.comments );
@@ -100,10 +100,17 @@ var SettingsIconFactory = function($,id) {
 	};
 };
 
-var url = "/news/2013/05/259825.json";
+var uri = new URI( document.location.href );
+var search = uri.search(true);
+var url = search['url'];
+if (!url || url==='') document.location.href='urlhelp.html';
+
+function getProxyUrl(url) {
+	return "/js/proxy.php?url=" +  escape(url);
+}
 
 /* execute the page */
 function main($) {
-	layoutModule($, EmbedVideo(), url);
+	layoutModule($, EmbedVideo(), getProxyUrl(url) );
 }
 jQuery(main);
