@@ -47,3 +47,5 @@ stuff is interspersed.
 After this is done, you can regenerate the articles, and json files will be written alongside the php files in /news.
 
 The js frontend then uses these json files as source material for each article.
+
+To use js, check this out, and then move the js folder into the sf-active site's docroot.
