@@ -1,39 +1,94 @@
 
 
 var layoutModule = function ($, EV, url) {
-	
+
 	$('#topbar').prepend("<span>la.indymedia.org</span>");
 	var s = SettingsIconFactory($,'#topbar');
 	s.drawWidget();
 	
 	$('#topbar').append("<span class='menu'>breaking<img src='list.png' align='absmiddle' /></span>");
-	$('#topbar').append("<span id='#local' class='menu'>local</span>");
+	$('#topbar').append("<span class='menu' id='localbutton'>local</span>");
 	$('#topbar').append("<span class='menu'>calendar</span>");
 	$('#topbar').append("<span class='menu'>features</span>");
 	$('#topbar').append("<span class='menu'><b>publish</b></span>");
 
-	$.getJSON(url).done(function (data) {
-		insertStory( data.article );
-		insertComments( data.comments );
-	});
+	function displayLocal() {
+		$('#content').css('display','none');
+		$('#local').css('display','block');
+		$('#localbutton').on('click',hideLocal);
+	}
+	function hideLocal() {
+		$('#content').css('display','block');
+		$('#local').css('display','none');
+		$('#localbutton').on('click',displayLocal);
+	}
+	
+	var now = new Date();
+	var rsstime = localStorage['rsstime'];
+	if (rsstime == null || rsstime == 0 || rsstime > now.valueOf()+360000) {
+		$.getFeed({
+			url: 'proxy.php?url=http://la.indymedia.org/newswire.rss',
+			success: function(feed) {
+			  var html = '<ul>';
+			  for(var i = 0; i < feed.items.length && i < 15; i++) {
+						var item = feed.items[i];
+						html += '<li><a href="?url=' 
+						+ item.link.replace('.php','.json')
+						+ '">'
+						+ item.title
+						+ '</a></li>';
+			  }
+			  html = html + '</ul>';
+			  $('#local').append(html);
+			  $('#localbutton').on('click',displayLocal);
+			  localStorage['rss'] = html;
+              localStorage['rsstime'] = now;
+			} 
+	    });
+		
+	} else {
+		var html = localStorage['rss'];
+		$('#local').append(html);
+  	    $('#localbutton').on('click',displayLocal);
+	}
+	
+
+
+
+	if (url!="") {
+		$.getJSON(url).done(function (data) {
+			insertStory( data.article );
+			insertComments( data.comments );
+		});
+	} else {
+	}
+
+
 	
 	function insertStory(d) {
 		$('#heading').append(d.heading);
 		$('#summary').append(d.summary);
 		$('#author').append('by '+d.author);
 		$('#article').append(d.article);
+		$('#article').append('<p><a href="'+d.link+'">'+d.link+'</a></p>');
 	}
 	function insertComments(d) {
-	  var commentTemplate = '<div id="article-{{i}}"><h2>{{heading}}</h2><p>by {{{author}}}</p>{{{article}}}</div>';
+	  var commentTemplate = '<div id="article-{{i}}"><h2>{{heading}}</h2><p>by {{{author}}}</p>{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
 		for(var i=0;i<d.length;i++) {
 		  var data = d[i];
 			data.i = i;
 			data.article = Encoder.htmlDecode(data.article);
-			data.author = Encoder.htmlDecode(data.author)
+			if (data.mime_type=='text/plain') {
+				data.article = data.article.replace( /\n/mg, '<br />' );
+			}
+			data.author = Encoder.htmlDecode(data.author);
 			var text = Mustache.render(commentTemplate, data );
 			text = EV.embedYouTube(text);
 			$('#comments').append( text );
 		}
+	}
+	function insertAttachments(d) {
+	
 	}
 
 	

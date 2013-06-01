@@ -3,16 +3,22 @@
 <head>
 
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
 	<script type="text/javascript" src="mustache.js"></script>
 	<script type="text/javascript" src="encoder.js"></script>
 	<script type="text/javascript" src="jfeed.js"></script>
 	<script type="text/javascript" src="jrss.js"></script>
+	<script type="text/javascript" src="jquery.jfeed.js"></script>
 	<script type="text/javascript" src="URI.js"></script>
 	<script type="text/javascript" src="main.js"></script>
 	<link rel="stylesheet" href="main.css" />
 </head>
 <body>
 <div id="topbar" class="region"></div>
+<div id="local"></div>
+<div id="breaking"></div>
+<div id="feature"></div>
+<div id="calendar"></div>
 <div id="content" class="region">
 	<h1 id="heading"></h1>
 	<p id="summary"></p>
@@ -20,6 +26,6 @@
 	<div id="article"></div>
 	<div id="comments"></div>
 </div>
-<div id="bottombar" class="region"></div>
+<div id="bottombar" class="region">if you see this, it's loading</div>
 </body>
 </html>
