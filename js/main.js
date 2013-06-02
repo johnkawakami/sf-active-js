@@ -12,17 +12,17 @@ var layoutModule = function ($, EV, url) {
 	$('#topbar').append("<span class='menu'>features</span>");
 	$('#topbar').append("<span class='menu'><b>publish</b></span>");
 
-	function displayLocal() {
+	var displayLocal = function() {
 		$('#content').css('display','none');
 		$('#local').css('display','block');
 		$('#localbutton').on('click',hideLocal);
-	}
-	function hideLocal() {
+	};
+	var hideLocal = function() {
 		$('#content').css('display','block');
 		$('#local').css('display','none');
 		$('#localbutton').on('click',displayLocal);
-	}
-	
+	};
+
 	var now = new Date();
 	var rsstime = localStorage['rsstime'];
 	if (rsstime == null || rsstime == 0 || rsstime > now.valueOf()+360000) {
@@ -30,7 +30,7 @@ var layoutModule = function ($, EV, url) {
 			url: 'proxy.php?url=http://la.indymedia.org/newswire.rss',
 			success: function(feed) {
 			  var html = '<ul>';
-			  for(var i = 0; i < feed.items.length && i < 15; i++) {
+			  for(var i = 0; i < feed.items.length && i < 55; i++) {
 						var item = feed.items[i];
 						html += '<li><a href="?url=' 
 						+ item.link.replace('.php','.json')
@@ -45,34 +45,46 @@ var layoutModule = function ($, EV, url) {
               localStorage['rsstime'] = now;
 			} 
 	    });
-		
 	} else {
 		var html = localStorage['rss'];
 		$('#local').append(html);
   	    $('#localbutton').on('click',displayLocal);
 	}
-	
-
-
 
 	if (url!="") {
 		$.getJSON(url).done(function (data) {
 			insertStory( data.article );
+			insertAttachments( data.attachments );
 			insertComments( data.comments );
 		});
 	} else {
 	}
 
-
-	
-	function insertStory(d) {
+	var insertStory = function(d) {
 		$('#heading').append(d.heading);
 		$('#summary').append(d.summary);
 		$('#author').append('by '+d.author);
-		$('#article').append(d.article);
-		$('#article').append('<p><a href="'+d.link+'">'+d.link+'</a></p>');
-	}
-	function insertComments(d) {
+		var article = $('#article');
+		if (d.media!="") article.append(d.media);
+		article.append(d.article);
+		article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>');
+		
+	};
+	var insertAttachments = function(d) {
+		var att = $('#attachments');
+		var i = 0;
+		var template = '<div id="article-{{i}}"><h2>{{heading}}</h2><p>by {{{author}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" /></a></p></div>';
+		// if (d.length == 0) return; // bail out on empty
+		d.forEach( 
+				function (a) {
+					++i;
+					var text = Mustache.render( template, a );
+					att.append( text );
+					console.log( i );
+				}
+		);
+	};
+	var insertComments = function(d) {
 	  var commentTemplate = '<div id="article-{{i}}"><h2>{{heading}}</h2><p>by {{{author}}}</p>{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
 		for(var i=0;i<d.length;i++) {
 		  var data = d[i];
@@ -86,13 +98,7 @@ var layoutModule = function ($, EV, url) {
 			text = EV.embedYouTube(text);
 			$('#comments').append( text );
 		}
-	}
-	function insertAttachments(d) {
-	
-	}
-
-	
-	
+	};
 };
 
 var EmbedVideo = function() {
@@ -109,9 +115,9 @@ var EmbedVideo = function() {
 				'" frameborder="0" allowfullscreen></iframe>';
 		}
 		return s + output.join();
-	}
+	};
 	var embedDailyMotion = function (s) {
-	}
+	};
 	return {
 		embedYouTube: embedYouTube,
 		embedDailyMotion: embedDailyMotion
@@ -159,13 +165,17 @@ var uri = new URI( document.location.href );
 var search = uri.search(true);
 var url = search['url'];
 if (!url || url==='') document.location.href='urlhelp.html';
+var cache = search['cache'];
 
-function getProxyUrl(url) {
+var getProxyUrl = function(url) {
 	return "/js/proxy.php?url=" +  escape(url);
-}
+};
 
 /* execute the page */
 function main($) {
+	if (cache=="1") {
+		localStorage['rsstime'] = 0;
+	}
 	layoutModule($, EmbedVideo(), getProxyUrl(url) );
 }
 jQuery(main);

@@ -14,7 +14,7 @@ span.menu {
 body {
 	padding: 0;
 	margin: 0;
-	font-family:  "Libre Baskerville";
+	font-family: Lucida,"Lucida Sans","Lucida Sans Unicode","Lucida Grande";
 	color: #222;
 	background-color: white;
 }
@@ -32,7 +32,13 @@ body {
 	padding-top: 0.5em;
 }
 #local {
+    margin: 16pt;
 	display: none;
+}
+#local ul li {
+	margin-top: 0.5em;
+	padding: 0.25em;
+	border: 1px dotted silver;
 }
 #content {
 	margin: 16pt;
@@ -44,7 +50,6 @@ body {
 }
 
 #heading {
-	font-weight: normal;
 	color: black;
 }
 #summary {
@@ -53,11 +58,8 @@ body {
 #author {
 	font-size: 90%;
 }
-#article {
+#article, #comments {
 	line-height: 1.8em;
-}
-h2 {
-	font-weight: normal;
 }
 
 /* responsive section */
