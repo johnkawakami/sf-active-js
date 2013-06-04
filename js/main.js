@@ -11,6 +11,7 @@ var layoutModule = function ($, EV, url) {
 	$('#topbar').append("<span class='menu'>calendar</span>");
 	$('#topbar').append("<span class='menu'>features</span>");
 	$('#topbar').append("<span class='menu'><b>publish</b></span>");
+	new QRCode( document.getElementById('qrcode'), window.location.href );
 
 	var displayLocal = function() {
 		$('#content').css('display','none');
@@ -144,6 +145,7 @@ var SettingsIconFactory = function($,id) {
 		// discover the x and y position of the widget
 	};
 	var drawDialog = function() {
+	  localStorage['rsstime']=0;
 		alert("drawDialog " + id);
 	};
 	var handlers = function() {
