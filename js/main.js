@@ -66,7 +66,7 @@ var layoutModule = function ($, EV, url) {
 		$('#summary').append(d.summary);
 		$('#author').append('by '+d.author);
 		var article = $('#article');
-		if (d.media!="") article.append(d.media);
+		if (d.media!="") article.append('<p class="media">'+d.media+'</p>');
 		article.append(d.article);
 		article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>');
 		
@@ -74,14 +74,14 @@ var layoutModule = function ($, EV, url) {
 	var insertAttachments = function(d) {
 		var att = $('#attachments');
 		var i = 0;
-		var template = '<div id="article-{{i}}"><h2>{{heading}}</h2><p>by {{{author}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" /></a></p></div>';
+		var template = '<div id="article-{{i}}"><h2>{{heading}}</h2><p class="byline">by {{{author}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" class="photo" /></a></p></div>';
 		// if (d.length == 0) return; // bail out on empty
 		d.forEach( 
 				function (a) {
 					++i;
+					a.i = i;
 					var text = Mustache.render( template, a );
 					att.append( text );
-					console.log( i );
 				}
 		);
 	};

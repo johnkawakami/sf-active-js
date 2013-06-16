@@ -1,5 +1,15 @@
 @import url(http://fonts.googleapis.com/css?family=Libre+Baskerville:400,400italic,700);
 
+h2 {
+    margin-bottom: 0.25em;
+    padding-bottom: 0em;
+}
+p.byline {
+	margin-top: 0px;
+}
+p.media {
+	font-size: 50%;
+}
 span.icons {
 	float:right;
 	padding-right: 1.5em;
@@ -33,6 +43,7 @@ body {
 }
 #local {
     margin: 16pt;
+    margin-top: 64pt;
 	display: none;
 }
 #local ul li {
@@ -61,17 +72,46 @@ body {
 #article, #comments {
 	line-height: 1.8em;
 }
+#article {
+	display: block;
+}
+#qrcode {
+	text-align: center;
+	width: 100%;
+}
 
 /* responsive section */
-@media screen and (min-width: 30em) {
+@media screen {
   #content {
-		width: 30em;
+        width: 640px;
+        margin-left: auto;
+        margin-right: auto;
+  }
+  img.photo {
+    width: 100%;
+  }
+.videoPlayer {
+    width: 320px;
+  }
+}
+@media screen and (max-width: 320px) {
+  #content {
+		width: 300px;
 		margin-left: auto;
 		margin-right: auto;
   }
-	.videoPlayer {
-		width: 100%;
-
-	}
+  .videoPlayer {
+	width: 100%;
+  }
+}
+@media screen and (max-width: 480px) {
+  #content {
+        width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+  }
+  .videoPlayer {
+    width: 100%;
+  }
 }
 
