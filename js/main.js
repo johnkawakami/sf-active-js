@@ -6,11 +6,11 @@ var layoutModule = function ($, EV, url) {
 	var s = SettingsIconFactory($,'#topbar');
 	s.drawWidget();
 	
-	$('#topbar').append("<span class='menu'>breaking<img src='list.png' align='absmiddle' /></span>");
+	$('#topbar').append("<span class='menu' id='breakingbutton'>breaking</span>");
 	$('#topbar').append("<span class='menu' id='localbutton'>local</span>");
-	$('#topbar').append("<span class='menu'>calendar</span>");
-	$('#topbar').append("<span class='menu'>features</span>");
-	$('#topbar').append("<span class='menu'><b>publish</b></span>");
+	$('#topbar').append("<span class='menu' id='calendarbutton'>calendar</span>");
+	$('#topbar').append("<span class='menu' id='featuresbutton'>features</span>");
+	$('#topbar').append("<span class='menu' id='publishbutton'><b>publish</b></span>");
 	new QRCode( document.getElementById('qrcode'), window.location.href );
 
 	var displayLocal = function() {
@@ -41,7 +41,6 @@ var layoutModule = function ($, EV, url) {
 			  }
 			  html = html + '</ul>';
 			  $('#local').append(html);
-			  $('#localbutton').on('click',displayLocal);
 			  localStorage['rss'] = html;
               localStorage['rsstime'] = now;
 			} 
@@ -49,9 +48,20 @@ var layoutModule = function ($, EV, url) {
 	} else {
 		var html = localStorage['rss'];
 		$('#local').append(html);
-  	    $('#localbutton').on('click',displayLocal);
 	}
+    $('#localbutton'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
+	$('#breakingbutton').on('click',function(){History.pushState(null,"local","?v=brea")});
+	$('#calendarbutton').on('click',function(){History.pushState(null,"local","?v=cale")});
+	$('#featuresbutton').on('click',function(){History.pushState(null,"local","?v=feat")});
+	$('#publishbutton' ).on('click',function(){History.pushState(null,"local","?v=publ")});
 
+	// state change hander
+	var stateChangeHandler = function () {
+		var State = History.getState();
+		window.alert(State.url);
+	};
+    History.Adapter.bind(window, 'statechange', stateChangeHandler);
+	
 	if (url!="") {
 		$.getJSON(url).done(function (data) {
 			insertStory( data.article );
