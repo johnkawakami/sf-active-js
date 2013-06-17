@@ -13,15 +13,15 @@ var layoutModule = function ($, EV, url) {
 	$('#topbar').append("<span class='menu' id='publishbutton'><b>publish</b></span>");
 	new QRCode( document.getElementById('qrcode'), window.location.href );
 
-	var displayLocal = function() {
-		$('#content').css('display','none');
-		$('#local').css('display','block');
-		$('#localbutton').on('click',hideLocal);
-	};
-	var hideLocal = function() {
-		$('#content').css('display','block');
-		$('#local').css('display','none');
-		$('#localbutton').on('click',displayLocal);
+	// fixme - need a global view switcher that will hide all, then reveal one
+	var toggleLocal = function() {
+		if ($('#local').css('display')!='block') {
+			$('#content').css('display','none');
+			$('#local').css('display','block');
+		} else {
+			$('#content').css('display','block');
+			$('#local').css('display','none');
+		}
 	};
 
 	var now = new Date();
@@ -50,15 +50,38 @@ var layoutModule = function ($, EV, url) {
 		$('#local').append(html);
 	}
     $('#localbutton'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
-	$('#breakingbutton').on('click',function(){History.pushState(null,"local","?v=brea")});
-	$('#calendarbutton').on('click',function(){History.pushState(null,"local","?v=cale")});
-	$('#featuresbutton').on('click',function(){History.pushState(null,"local","?v=feat")});
-	$('#publishbutton' ).on('click',function(){History.pushState(null,"local","?v=publ")});
+	$('#breakingbutton').on('click',function(){History.pushState(null,"breaking news","?v=brea")});
+	$('#calendarbutton').on('click',function(){History.pushState(null,"calendar","?v=cale")});
+	$('#featuresbutton').on('click',function(){History.pushState(null,"features","?v=feat")});
+	$('#publishbutton' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
 
-	// state change hander
+	/** 
+	 * state change hander - routes all the URLs to the correct screen 
+	 * param 'v' picks a view
+	 * param 'u' sets a url if needed
+	 */
 	var stateChangeHandler = function () {
-		var State = History.getState();
-		window.alert(State.url);
+		var state = History.getState();
+		var uri = new URI(state.url);
+		var values = URI.parseQuery(uri.query());
+		//console.log(values.v);
+		switch(values.v) {
+			case 'thum':
+				break;
+			case 'loca':
+				toggleLocal();
+				break;
+			case 'brea':
+				break;
+			case 'feat':
+				break;
+			case 'publ':
+				break;
+			case 'cale':
+				break;
+			default:
+				break;				
+		}
 	};
     History.Adapter.bind(window, 'statechange', stateChangeHandler);
 	
@@ -173,21 +196,20 @@ var SettingsIconFactory = function($,id) {
 	};
 };
 
-var uri = new URI( document.location.href );
-var search = uri.search(true);
-var url = search['url'];
-if (!url || url==='') document.location.href='urlhelp.html';
-var cache = search['cache'];
-
 var getProxyUrl = function(url) {
 	return "/js/proxy.php?url=" +  escape(url);
 };
+var uri = new URI( document.location.href );
+var search = uri.search(true);
+//var url = search['url'];
+//if (!url || url==='') document.location.href='urlhelp.html';
+var cache = search['cache'];
 
 /* execute the page */
 function main($) {
 	if (cache=="1") {
 		localStorage['rsstime'] = 0;
 	}
-	layoutModule($, EmbedVideo(), getProxyUrl(url) );
+	layoutModule($, EmbedVideo(), '' );
 }
 jQuery(main);
