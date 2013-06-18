@@ -1,99 +1,75 @@
 
+// our namespace
+var IMC = {};
 
-var layoutModule = function ($, EV, url) {
+var layoutModule = function ($, EV) {
 
-	$('#topbar').prepend("<span>la.indymedia.org</span>");
-	var s = SettingsIconFactory($,'#topbar');
-	s.drawWidget();
-	
-	$('#topbar').append("<span class='menu' id='breakingbutton'>breaking</span>");
-	$('#topbar').append("<span class='menu' id='localbutton'>local</span>");
-	$('#topbar').append("<span class='menu' id='calendarbutton'>calendar</span>");
-	$('#topbar').append("<span class='menu' id='featuresbutton'>features</span>");
-	$('#topbar').append("<span class='menu' id='publishbutton'><b>publish</b></span>");
-	new QRCode( document.getElementById('qrcode'), window.location.href );
-
+	// display switcher
 	// fixme - need a global view switcher that will hide all, then reveal one
-	var toggleLocal = function() {
-		if ($('#local').css('display')!='block') {
-			$('#content').css('display','none');
-			$('#local').css('display','block');
-		} else {
-			$('#content').css('display','block');
-			$('#local').css('display','none');
+	var views = { 
+			'thum':'#thumbscreen',
+			'loca':'#local',
+			'brea':'#breakingnews',
+			'feat':'#feature',
+			'publ':'#publish',
+			'cale':'#calendar',
+			'cont':'#content'
+			};
+	var displaySwitcher = function(view) {
+		var id = views[view];
+		if (id==null) id='thum';
+		for (var v in views) {
+			if (v == view) {
+				$(views[v]).css('display','block');
+			} else {
+				$(views[v]).css('display', 'none');
+			}
 		}
 	};
 
-	var now = new Date();
-	var rsstime = localStorage['rsstime'];
-	if (rsstime == null || rsstime == 0 || rsstime > now.valueOf()+360000) {
-		$.getFeed({
-			url: 'proxy.php?url=http://la.indymedia.org/newswire.rss',
-			success: function(feed) {
-			  var html = '<ul>';
-			  for(var i = 0; i < feed.items.length && i < 55; i++) {
-						var item = feed.items[i];
-						html += '<li><a href="?url=' 
-						+ item.link.replace('.php','.json')
-						+ '">'
-						+ item.title
-						+ '</a></li>';
-			  }
-			  html = html + '</ul>';
-			  $('#local').append(html);
-			  localStorage['rss'] = html;
-              localStorage['rsstime'] = now;
-			} 
-	    });
-	} else {
-		var html = localStorage['rss'];
-		$('#local').append(html);
-	}
-    $('#localbutton'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
-	$('#breakingbutton').on('click',function(){History.pushState(null,"breaking news","?v=brea")});
-	$('#calendarbutton').on('click',function(){History.pushState(null,"calendar","?v=cale")});
-	$('#featuresbutton').on('click',function(){History.pushState(null,"features","?v=feat")});
-	$('#publishbutton' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
-
+	
 	/** 
 	 * state change hander - routes all the URLs to the correct screen 
 	 * param 'v' picks a view
 	 * param 'u' sets a url if needed
 	 */
-	var stateChangeHandler = function () {
+	var displayFromQuery = function () {
 		var state = History.getState();
-		var uri = new URI(state.url);
+		var uri = new URI(state.url);	
 		var values = URI.parseQuery(uri.query());
-		//console.log(values.v);
+		console.log(values.v);
 		switch(values.v) {
-			case 'thum':
-				break;
-			case 'loca':
-				toggleLocal();
-				break;
-			case 'brea':
-				break;
-			case 'feat':
-				break;
-			case 'publ':
-				break;
-			case 'cale':
-				break;
-			default:
+			case 'cont': 
+				displaySwitcher(values.v);
+				if (localStorage[values.url] != null) {
+					var data = JSON.parse(localStorage[values.url]);
+					insertStory( data.article );
+					insertAttachments( data.attachments );
+					insertComments( data.comments );				
+				} else {
+					$.getJSON( getProxyUrl(values.url) ).done(function (data) {
+						localStorage[values.url] = JSON.stringify(data);
+						insertStory( data.article );
+						insertAttachments( data.attachments );
+						insertComments( data.comments );
+					});
+				}
 				break;				
+			case 'loca':
+			case 'brea':
+			case 'feat':
+			case 'publ':
+			case 'cale':
+				displaySwitcher(values.v);
+				break;
+			case 'thum':
+			default:
+				displaySwitcher(values.v);
+			break;
 		}
 	};
-    History.Adapter.bind(window, 'statechange', stateChangeHandler);
-	
-	if (url!="") {
-		$.getJSON(url).done(function (data) {
-			insertStory( data.article );
-			insertAttachments( data.attachments );
-			insertComments( data.comments );
-		});
-	} else {
-	}
 
+    // utitiles to fill in the layout
 	var insertStory = function(d) {
 		$('#heading').append(d.heading);
 		$('#summary').append(d.summary);
@@ -133,8 +109,79 @@ var layoutModule = function ($, EV, url) {
 			$('#comments').append( text );
 		}
 	};
-};
+	// draw the calendar
+	// draw a list of stuff (move the rss feed code here)
+	// draw local
+	// draw breaking news
+	// draw features
 
+	// decorate the top bar
+	$('#topbar').append("<span class='menu' id='thumbscreenbutton'><img src='list.png' /></span>")
+	$('#topbar').append("<span>la.indymedia.org</span>");
+	var s = SettingsIconFactory($,'#topbar');
+	s.drawWidget();
+	$('#topbar').append("<span class='menu' id='breakingbutton'>breaking</span>");
+	$('#topbar').append("<span class='menu' id='localbutton'>local</span>");
+	$('#topbar').append("<span class='menu' id='calendarbutton'>calendar</span>");
+	$('#topbar').append("<span class='menu' id='featuresbutton'>features</span>");
+	$('#topbar').append("<span class='menu' id='publishbutton'><b>publish</b></span>");
+	// load up the bottom area
+	new QRCode( document.getElementById('qrcode'), window.location.href );
+
+	// attach actions to buttons
+    $('#thumbscreenbutton').on('click',function(){History.pushState(null,"thumbscreen","?v=thum")});
+    $('#localbutton'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
+	$('#breakingbutton').on('click',function(){History.pushState(null,"breaking news","?v=brea")});
+	$('#calendarbutton').on('click',function(){History.pushState(null,"calendar","?v=cale")});
+	$('#featuresbutton').on('click',function(){History.pushState(null,"features","?v=feat")});
+	$('#publishbutton' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
+
+	// attach state handlers for history
+    History.Adapter.bind(window, 'statechange', displayFromQuery);
+    // for starters, call the handler
+    displayFromQuery();
+
+    
+
+	
+	// load up the local rss feed
+	var now = new Date();
+	var rsstime = localStorage['rsstime'];
+	if (rsstime == null || rsstime == 0 || rsstime > now.valueOf()+360000) {
+		$.getFeed({
+			url: 'proxy.php?url=http://la.indymedia.org/newswire.rss',
+			success: function(feed) {
+			  var html = '<ul>';
+			  for(var i = 0; i < feed.items.length && i < 55; i++) {
+						var item = feed.items[i];
+						html += '<li><a href="?v=cont&url=' 
+						+ item.link.replace('.php','.json')
+						+ '">'
+						+ item.title
+						+ '</a></li>';
+			  }
+			  html = html + '</ul>';
+			  $('#local').append(html);
+			  localStorage['rss'] = html;
+              localStorage['rsstime'] = now;
+			} 
+	    });
+	} else {
+		var html = localStorage['rss'];
+		$('#local').append(html);
+	}
+	// load up features
+	$('#feature').append('feature');
+	// load up the calendar
+	$('#calendar').append('calendar');
+	// load up breaking news
+	$('#breakingnews').append('breaking news');
+	$('#publish').append('publish');
+	$('#article').append('article');
+
+}; // end of the layout module
+
+// useful modules
 var EmbedVideo = function() {
 	/* finds plain youtube urls and turns them into embeds */
 	var embedYouTube = function (s) {
@@ -163,6 +210,7 @@ var EmbedAudio = function() {
 		
 	};
 };
+
 /* not sure what pattern this is.  Similar to Revealing Module, but it instantiates a new set of functions
  * with each call.  So it's really like a constructor function.  This style is wasteful if it's used >1 time
  * because all the functions are instantiated anew each time.
@@ -178,7 +226,7 @@ var SettingsIconFactory = function($,id) {
 		// discover the x and y position of the widget
 	};
 	var drawDialog = function() {
-	  localStorage['rsstime']=0;
+		localStorage['rsstime'] = 0;
 		alert("drawDialog " + id);
 	};
 	var handlers = function() {
@@ -196,20 +244,31 @@ var SettingsIconFactory = function($,id) {
 	};
 };
 
+// converts a regular url into a url pulled by the local proxy script
 var getProxyUrl = function(url) {
 	return "/js/proxy.php?url=" +  escape(url);
 };
-var uri = new URI( document.location.href );
-var search = uri.search(true);
-//var url = search['url'];
-//if (!url || url==='') document.location.href='urlhelp.html';
-var cache = search['cache'];
 
-/* execute the page */
+//start of application
+/* execute the page after the entire DOM is loaded */
 function main($) {
+	var uri = new URI( document.location.href );
+	var search = uri.search(true);
+	var url = search['url'];
+	var v = search['v'];
+	if ( v ) {
+		console.log('v specified, so doing nothing');
+	} else	if (!url || url==='') {
+		console.log("no  url specified, changing to thumb");
+		History.replaceState(null, "thumbscreen", "?v=thum");
+	} else {
+		console.log("url set, assuming it's content");
+		History.replaceState(null, "content", "/?v=cont&url=" + url);
+	}
+	var cache = search['cache'];
 	if (cache=="1") {
 		localStorage['rsstime'] = 0;
 	}
-	layoutModule($, EmbedVideo(), '' );
+	layoutModule($, EmbedVideo() );
 }
 jQuery(main);
