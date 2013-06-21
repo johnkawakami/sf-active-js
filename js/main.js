@@ -16,8 +16,7 @@ var layoutModule = function ($, EV) {
 			'cont':'#content'
 			};
 	var displaySwitcher = function(view) {
-		var id = views[view];
-		if (id==null) id='thum';
+		if (view==null || view=="") view='thum';
 		for (var v in views) {
 			if (v == view) {
 				$(views[v]).css('display','block');
@@ -40,19 +39,22 @@ var layoutModule = function ($, EV) {
 		console.log(values.v);
 		switch(values.v) {
 			case 'cont': 
-				displaySwitcher(values.v);
-				if (localStorage[values.url] != null) {
-					var data = JSON.parse(localStorage[values.url]);
-					insertStory( data.article );
-					insertAttachments( data.attachments );
-					insertComments( data.comments );				
-				} else {
-					$.getJSON( getProxyUrl(values.url) ).done(function (data) {
-						localStorage[values.url] = JSON.stringify(data);
+				if (values.url) {
+					console.log(values.url);
+					displaySwitcher(values.v);
+					if (localStorage[values.url] != null) {
+						var data = JSON.parse(localStorage[values.url]);
 						insertStory( data.article );
 						insertAttachments( data.attachments );
-						insertComments( data.comments );
-					});
+						insertComments( data.comments );				
+					} else {
+						$.getJSON( getProxyUrl(values.url) ).done(function (data) {
+							localStorage[values.url] = JSON.stringify(data);
+							insertStory( data.article );
+							insertAttachments( data.attachments );
+							insertComments( data.comments );
+						});
+					}
 				}
 				break;				
 			case 'loca':
@@ -71,10 +73,11 @@ var layoutModule = function ($, EV) {
 
     // utitiles to fill in the layout
 	var insertStory = function(d) {
-		$('#heading').append(d.heading);
-		$('#summary').append(d.summary);
-		$('#author').append('by '+d.author);
+		$('#heading').html(d.heading);
+		$('#summary').html(d.summary);
+		$('#author').html('by '+d.author);
 		var article = $('#article');
+		article.html('');
 		if (d.media!="") article.append('<p class="media">'+d.media+'</p>');
 		article.append(d.article);
 		article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>');
@@ -85,6 +88,7 @@ var layoutModule = function ($, EV) {
 		var i = 0;
 		var template = '<div id="article-{{i}}"><h2>{{heading}}</h2><p class="byline">by {{{author}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" class="photo" /></a></p></div>';
 		// if (d.length == 0) return; // bail out on empty
+		att.html(''); // clear them
 		d.forEach( 
 				function (a) {
 					++i;
@@ -96,7 +100,9 @@ var layoutModule = function ($, EV) {
 	};
 	var insertComments = function(d) {
 	  var commentTemplate = '<div id="article-{{i}}"><h2>{{heading}}</h2><p>by {{{author}}}</p>{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
-		for(var i=0;i<d.length;i++) {
+	  var comm = $('#comments');
+	  comm.html(''); // clear it out
+	  for(var i=0;i<d.length;i++) {
 		  var data = d[i];
 			data.i = i;
 			data.article = Encoder.htmlDecode(data.article);
@@ -106,8 +112,8 @@ var layoutModule = function ($, EV) {
 			data.author = Encoder.htmlDecode(data.author);
 			var text = Mustache.render(commentTemplate, data );
 			text = EV.embedYouTube(text);
-			$('#comments').append( text );
-		}
+			comm.append( text );
+	  }
 	};
 	// draw the calendar
 	// draw a list of stuff (move the rss feed code here)
@@ -116,14 +122,14 @@ var layoutModule = function ($, EV) {
 	// draw features
 
 	// decorate the top bar
-	$('#topbar').append("<span class='menu' id='thumbscreenbutton'><img src='list.png' /></span>")
+	$('#topbar').append("<span class='icon' id='thumbscreenbutton'><img src='list.png' /></span>")
 	$('#topbar').append("<span>la.indymedia.org</span>");
 	var s = SettingsIconFactory($,'#topbar');
 	s.drawWidget();
-	$('#topbar').append("<span class='menu' id='breakingbutton'>breaking</span>");
-	$('#topbar').append("<span class='menu' id='localbutton'>local</span>");
-	$('#topbar').append("<span class='menu' id='calendarbutton'>calendar</span>");
 	$('#topbar').append("<span class='menu' id='featuresbutton'>features</span>");
+	$('#topbar').append("<span class='menu' id='localbutton'>local</span>");
+	$('#topbar').append("<span class='menu' id='breakingbutton'>breaking</span>");
+	$('#topbar').append("<span class='menu' id='calendarbutton'>calendar</span>");
 	$('#topbar').append("<span class='menu' id='publishbutton'><b>publish</b></span>");
 	// load up the bottom area
 	new QRCode( document.getElementById('qrcode'), window.location.href );
@@ -135,6 +141,11 @@ var layoutModule = function ($, EV) {
 	$('#calendarbutton').on('click',function(){History.pushState(null,"calendar","?v=cale")});
 	$('#featuresbutton').on('click',function(){History.pushState(null,"features","?v=feat")});
 	$('#publishbutton' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
+    $('#blocal'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
+	$('#bbreaking').on('click',function(){History.pushState(null,"breaking news","?v=brea")});
+	$('#bcalendar').on('click',function(){History.pushState(null,"calendar","?v=cale")});
+	$('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat")});
+	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
 
 	// attach state handlers for history
     History.Adapter.bind(window, 'statechange', displayFromQuery);
