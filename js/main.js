@@ -48,11 +48,12 @@ var layoutModule = function ($, EV) {
 						insertAttachments( data.attachments );
 						insertComments( data.comments );				
 					} else {
-						$.getJSON( getProxyUrl(values.url) ).done(function (data) {
-							localStorage[values.url] = JSON.stringify(data);
+						$.getJSON( getProxyUrl(values.url) ).done(function (data, error) {
+							if (error!='success') alert(error);
 							insertStory( data.article );
 							insertAttachments( data.attachments );
 							insertComments( data.comments );
+							localStorage[values.url] = JSON.stringify(data);
 						});
 					}
 				}

@@ -44,8 +44,8 @@ body {
 	padding-top: 0em;
 }
 #local {
-    margin: 16pt;
-    margin-top: 64pt;
+    margin: 2pt;
+    margin-top: 34pt;
 	display: none;
 	background-color: black;
 }
@@ -131,7 +131,7 @@ body {
 /* responsive section */
 @media screen {
   #content {
-        width: 640px;
+        width: 870px;
         margin-left: auto;
         margin-right: auto;
   }
@@ -144,9 +144,9 @@ body {
 }
 @media screen and (max-width: 320px) {
   #content {
-		width: 300px;
-		margin-left: auto;
-		margin-right: auto;
+    width: 90%;
+    max-width: 320px;
+    margin: 2px;
   }
   #topbar .menu {
     display: none;
@@ -157,9 +157,10 @@ body {
 }
 @media screen and (max-width: 480px) {
   #content {
-        width: 300px;
-        margin-left: auto;
-        margin-right: auto;
+    width: 90%;
+    max-width: 480px;
+    margin-left: 10px;
+    margin-right: 10px;
   }
   .videoPlayer {
     width: 100%;
@@ -169,6 +170,10 @@ body {
   }
 }
 @media screen and (max-width: 900px) {
+  #content {
+    width: 90%;
+    max-width: 900px;
+  }
   #topbar .menu {
     display: none;
   }
