@@ -183,8 +183,14 @@ function select_features( $category_id ) {
 	);
 	$features = array_map( 
 		function($a) {
-			$a['url'] = '/cache/';
-			return $a;
+			$b = array();
+			$b['id'] = $a['feature_id'];
+			$b['url'] = '/cache/';
+			$b['title'] = $a['title'];
+			$b['date'] = substr($a['date'],6,4).'/'.
+			             substr($a['date'],0,2).'/'.
+			             substr($a['date'],3,2);
+			return $b;
 		},
 		$features );
 	return $features;
