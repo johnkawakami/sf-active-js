@@ -204,7 +204,7 @@ var formatArticleList = function(json) {
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];
-		html += '<li><a href="?v=cont&url=' 
+		html += '<li><a href="?v=cont&url=http://la.indymedia.org' 
 		+ j.url
 		+ '">'
 		+ j.title
