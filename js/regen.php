@@ -41,7 +41,7 @@ switch($select) {
 		echo json_encode( select_features($production_category_id) );
 	break;
 	case 'breakingnews': 
-		echo json_encode( select_breaking_news() );
+		echo json_encode( select_breakingnews() );
 	break;
 	case 'calendar': 
 		echo json_encode( select_calendar() );
@@ -54,7 +54,7 @@ switch($select) {
 			array( 
 			    'local' => select_local(),
 				'features' => select_features($production_category_id),
-			    'breakingnews' => select_breaking_news(),
+			    'breakingnews' => select_breakingnews(),
 			    'calendar' => select_calendar()
 			)
 		);
@@ -62,7 +62,7 @@ switch($select) {
 }
 exit;
 
-function select_breaking_news() {
+function select_breakingnews() {
 	global $webcast, $max_stories;
 	load_webcast();
 	$count = 0;
@@ -71,7 +71,9 @@ function select_breaking_news() {
 		function($a) use (&$count) {
 			global $max_stories;
 			if ($count > $max_stories) return false;
-			if ($a['display']=='t' and $a['parent_id']==0 ) {
+			if ($a['display']=='t' 
+				and $a['parent_id']==0 
+				and $a['heading']!=null ) {
 				$count++;
 				return true;
 			}

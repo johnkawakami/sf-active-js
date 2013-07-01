@@ -48,24 +48,24 @@ body {
 	color: black;
 	padding-top: 1em;
 }
-#local {
+#local, #feature {
     margin: 2pt;
     margin-top: 34pt;
 	display: none;
 	background-color: black;
 }
-#local ul {
+ul.articlelist {
 	margin-left: 0;
 	padding-left: 0;
     list-style-type: none;
 }
-#local ul li {
+ul.articlelist li {
 	margin-top: 0;
 	padding: 1em;
 	border: none;
 	border-bottom: 1px solid silver;
 }
-#local ul li a {
+ul.articlelist li a {
 	color: white;
 	text-decoration: none;
 }

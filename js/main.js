@@ -157,41 +157,62 @@ var layoutModule = function ($, EV) {
 
 	
 	// load up the local rss feed
-	var now = new Date();
-	var rsstime = localStorage['rsstime'];
-	if (rsstime == null || rsstime == 0 || rsstime > now.valueOf()+360000) {
-		$.getFeed({
-			url: 'proxy.php?url=http://la.indymedia.org/newswire.rss',
-			success: function(feed) {
-			  var html = '<ul>';
-			  for(var i = 0; i < feed.items.length && i < 55; i++) {
-						var item = feed.items[i];
-						html += '<li><a href="?v=cont&url=' 
-						+ item.link.replace('.php','.json')
-						+ '">'
-						+ item.title
-						+ '</a></li>';
-			  }
-			  html = html + '</ul>';
-			  $('#local').append(html);
-			  localStorage['rss'] = html;
-              localStorage['rsstime'] = now;
-			} 
-	    });
-	} else {
-		var html = localStorage['rss'];
-		$('#local').append(html);
-	}
+	$.getFeed({
+		url: 'proxy.php?url=http://la.indymedia.org/newswire.rss',
+		success: function(feed) {
+		  console.log(feed);
+		  var html = '<ul class="articlelist">';
+		  for(var i = 0; i < feed.items.length && i < 55; i++) {
+					var item = feed.items[i];
+					html += '<li><a href="?v=cont&url=' 
+					+ item.link.replace('.php','.json')
+					+ '">'
+					+ item.title
+					+ '</a></li>';
+		  }
+		  html = html + '</ul>';
+		  $('#local').append(html);
+		} 
+    });
 	// load up features
-	$('#feature').append('feature');
+	$.getJSON( 
+		'regen.php',
+		{ "s":"features" },
+		function(j) {
+			$('#feature').append( formatArticleList(j) );	
+		}
+	);
 	// load up the calendar
 	$('#calendar').append('calendar');
 	// load up breaking news
-	$('#breakingnews').append('breaking news');
+	$.getJSON(
+		'regen.php',
+		{ "s":"breakingnews" },
+		function(j) {
+			$('#breakingnews').append( formatArticleList(j) );
+		}
+	);
 	$('#publish').append('publish');
 	$('#article').append('article');
 
 }; // end of the layout module
+
+/**
+ * json: an array of article link objects
+ */
+var formatArticleList = function(json) {
+	  var html = '<ul class="articlelist">';
+	  for(var i = 0; i < json.length ; i++) {
+	  	j = json[i];
+		html += '<li><a href="?v=cont&url=' 
+		+ j.url
+		+ '">'
+		+ j.title
+		+ '</a></li>';
+	  }
+	  html = html + '</ul>';	
+	  return html;
+};
 
 // useful modules
 var EmbedVideo = function() {
