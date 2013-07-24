@@ -122,17 +122,6 @@ var layoutModule = function ($, EV) {
 	// draw breaking news
 	// draw features
 
-	// decorate the top bar
-	$('#topbar').append("<span class='iconleft' id='thumbscreenbutton'><img src='list.png' /></span>")
-	$('#topbar').append("<span id='sitename'>la.indymedia.org</span>");
-	var s = SettingsIconFactory($,'#topbar');
-	s.drawWidget();
-	$('#topbar').append("<span class='menu' id='featuresbutton'>features</span>");
-	$('#topbar').append("<span class='menu' id='localbutton'>local</span>");
-	$('#topbar').append("<span class='menu' id='breakingbutton'>breaking</span>");
-	$('#topbar').append("<span class='menu' id='calendarbutton'>calendar</span>");
-	$('#topbar').append("<span class='menu' id='publishbutton'><b>publish</b></span>");
-
 	// attach actions to buttons
     $('#thumbscreenbutton').on('click',function(){History.pushState(null,"thumbscreen","?v=thum")});
     $('#localbutton'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
@@ -253,7 +242,7 @@ var SettingsIconFactory = function($,id) {
 	var x, y, direction;
 	var settings = {};
 	var drawWidget = function() {
-		$(id).append('<span class="iconright"><img id="'+id.substr(1)+'-settings" src="gear.png" align="absmiddle" /></span>');
+		$(id).append('<span class="iconright"><img id="'+id.substr(1)+'-settings" src="images/settings-black.png" align="absmiddle" /></span>');
 		// attach handler to it
 		$(id+"-settings").on("click", drawDialog);
 		// discover the x and y position of the widget

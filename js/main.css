@@ -32,8 +32,8 @@ body {
 	padding: 0;
 	margin: 0;
 	font-family: Lucida,"Lucida Sans","Lucida Sans Unicode","Lucida Grande";
-	color: #eee;
-	background-color: black;
+	color: #222;
+	background-color: #eee;
 }
 .region {
 	margin: 0;
@@ -43,16 +43,15 @@ body {
 	/* position: fixed; */
 	top: 0; left: 0;
 	width: 100%;
-	height: 2em;
-	background-color: #CCC;
+	height: 80px;
+	background-color: #000;
 	color: black;
-	padding-top: 1em;
 }
 #local, #feature {
     margin: 2pt;
     margin-top: 34pt;
 	display: none;
-	background-color: black;
+	background-color: white;
 }
 ul.articlelist {
 	margin-left: 0;
@@ -63,11 +62,15 @@ ul.articlelist li {
 	margin-top: 0;
 	padding: 1em;
 	border: none;
-	border-bottom: 1px solid silver;
+	border-bottom: 1px solid #666;
 }
 ul.articlelist li a {
-	color: white;
+	color: black;
 	text-decoration: none;
+}
+ul.articlelist li a:visited {
+    color: #aaa;
+    text-decoration: none;
 }
 #content {
 	margin: 16pt;
@@ -80,7 +83,7 @@ ul.articlelist li a {
 }
 
 #heading {
-	color: white;
+	color: black;
 }
 #summary {
 	font-style: italic;
