@@ -19,10 +19,10 @@
  */
 
 // machine-dependent configs
-if (0) {
-	$sf_active_config_path = "/www/la.indymedia.org/local/config/sfactive.cfg";
-} else {
+if ( $_SERVER['HTTP_HOST'] == 'indymedia.lo' ) {
 	$sf_active_config_path = "/home/johnk/Sites/la.indymedia.org/local/config/sfactive.cfg";
+} else {
+	$sf_active_config_path = "/www/la.indymedia.org/local/config/sfactive.cfg";
 }
 
 // script configs
@@ -34,23 +34,30 @@ list( $dbhost, $dbname, $dbuser, $dbpass, $production_category_id ) = get_settin
 // global cache var
 $webcast = NULL;
 
+// JSONP support
+if ($_GET['callback']) {
+	$callback = $_GET['callback'];
+} else {
+	$callback = false;
+}
+
 // parameter s selects which data to get
 $select = $_GET['s'];
 switch($select) {
 	case 'features': 
-		echo json_encode( select_features($production_category_id) );
+		$output = json_encode( select_features($production_category_id) );
 	break;
 	case 'breakingnews': 
-		echo json_encode( select_breakingnews() );
+		$output = json_encode( select_breakingnews() );
 	break;
 	case 'calendar': 
-		echo json_encode( select_calendar() );
+		$output = json_encode( select_calendar() );
 	break;
 	case 'local': 
-		echo json_encode( select_local() );
+		$output = json_encode( select_local() );
 	break;
 	case 'combo':  // all the feeds in one
-		echo json_encode(
+		$ouptut = json_encode(
 			array( 
 			    'local' => select_local(),
 				'features' => select_features($production_category_id),
@@ -60,6 +67,10 @@ switch($select) {
 		);
 	break;
 }
+header('Content-Type: text/javascript');
+if ($callback) echo $callback . '(';
+echo $output; 
+if ($callback) echo ');';
 exit;
 
 function select_breakingnews() {

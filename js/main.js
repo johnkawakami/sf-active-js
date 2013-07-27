@@ -82,20 +82,25 @@ var layoutModule = function ($, EV) {
 		if (d.media!="") article.append('<p class="media">'+d.media+'</p>');
 		article.append(d.article);
 		article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>');
-		
 	};
 	var insertAttachments = function(d) {
 		var att = $('#attachments');
 		var i = 0;
-		var template = '<div id="article-{{i}}"><h2>{{heading}}</h2><p class="byline">by {{{author}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" class="photo" /></a></p></div>';
+		var template = '<div id="article-{{i}}"><h2>{{heading}}</h2><p class="byline">by {{{author}}}</p><p>{{{article}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" class="photo" /></a></p></div>';
 		// if (d.length == 0) return; // bail out on empty
 		att.html(''); // clear them
 		d.forEach( 
 				function (a) {
 					++i;
 					a.i = i;
+					/* If the article contains a byline, it replaces the author field, and
+					   the byline is deleted. */
+					if ( a.article && ( matches = a.article.match( /^by (.*)$/m ) ) ) {
+						a.author = matches[1];
+						a.article = a.article.replace( /^by .*$/m, '' );
+					}
 					var text = Mustache.render( template, a );
-					att.append( text );
+					att.prepend( text );
 				}
 		);
 	};
@@ -123,13 +128,13 @@ var layoutModule = function ($, EV) {
 	// draw features
 
 	// attach actions to buttons
-    $('#thumbscreenbutton').on('click',function(){History.pushState(null,"thumbscreen","?v=thum")});
-    $('#localbutton'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
+  $('#thumbscreenbutton').on('click',function(){History.pushState(null,"thumbscreen","?v=thum")});
+  $('#localbutton'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
 	$('#breakingbutton').on('click',function(){History.pushState(null,"breaking news","?v=brea")});
 	$('#calendarbutton').on('click',function(){History.pushState(null,"calendar","?v=cale")});
 	$('#featuresbutton').on('click',function(){History.pushState(null,"features","?v=feat")});
 	$('#publishbutton' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
-    $('#blocal'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
+  $('#blocal'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
 	$('#bbreaking').on('click',function(){History.pushState(null,"breaking news","?v=brea")});
 	$('#bcalendar').on('click',function(){History.pushState(null,"calendar","?v=cale")});
 	$('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat")});
@@ -140,8 +145,18 @@ var layoutModule = function ($, EV) {
     // for starters, call the handler
     displayFromQuery();
 
+	// create a shortened url for the long url
+	/*
+	ferus = new FerusUrl( appkey );
+	ferus.create( { 'url': window.location.href, 'size': 5, 'case': 'lower' } );
+	*/
+
 	// load up the bottom area
-	new QRCode( document.getElementById('qrcode'), window.location.href );
+	new QRCode( document.getElementById('qrcode'), {
+		text: window.location.href,
+		width: 128,
+		height: 128
+	});
     
 
 	
@@ -165,7 +180,7 @@ var layoutModule = function ($, EV) {
     });
 	// load up features
 	$.getJSON( 
-		'regen.php',
+		'http://la.indymedia.org/js/regen.php?callback=?',
 		{ "s":"features" },
 		function(j) {
 			$('#feature').append( formatArticleList(j) );	
@@ -175,14 +190,13 @@ var layoutModule = function ($, EV) {
 	$('#calendar').append('calendar');
 	// load up breaking news
 	$.getJSON(
-		'regen.php',
-		{ "s":"breakingnews" },
+		'http://la.indymedia.org/js/regen.php?callback=?',
+		{ "s": "breakingnews" },
 		function(j) {
 			$('#breakingnews').append( formatArticleList(j) );
 		}
 	);
 	$('#publish').append('publish');
-	$('#article').append('article');
 
 }; // end of the layout module
 
@@ -190,6 +204,10 @@ var layoutModule = function ($, EV) {
  * json: an array of article link objects
  */
 var formatArticleList = function(json) {
+		if (json == null) {
+			console.log("json is null");
+			return;
+		}
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];

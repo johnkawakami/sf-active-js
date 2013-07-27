@@ -182,6 +182,12 @@ ul.articlelist li a:visited {
     display: none;
   }
 }
+@media screen and (max-width: 640px) {
+	p.media img {
+		width: 99%;
+		height: auto;
+	}
+}
 @media screen and (max-width: 900px) {
   #content {
     width: 90%;
