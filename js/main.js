@@ -146,11 +146,6 @@ var layoutModule = function ($, EV) {
 
 	// attach actions to buttons
   $('#thumbscreenbutton').on('click',function(){History.pushState(null,"thumbscreen","?v=thum")});
-  $('#localbutton'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
-	$('#breakingbutton').on('click',function(){History.pushState(null,"breaking news","?v=brea")});
-	$('#calendarbutton').on('click',function(){History.pushState(null,"calendar","?v=cale")});
-	$('#featuresbutton').on('click',function(){History.pushState(null,"features","?v=feat")});
-	$('#publishbutton' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
   $('#blocal'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
 	$('#bbreaking').on('click',function(){History.pushState(null,"breaking news","?v=brea")});
 	$('#bcalendar').on('click',function(){History.pushState(null,"calendar","?v=cale")});

@@ -101,15 +101,20 @@ ul.articlelist li a:visited {
 	text-align: center;
 	width: 100%;
 }
+#thumbscreen ul li.thumb span.label {
+	display: table-cell;
+	vertical-align: middle;
+	width: 119px;
+	height: 119px;
+}
 #thumbscreen ul li.thumb {
 	display: block;
 	float: left;
 	width: 119px;
-	height: 70px;
-	margin: 0.5pt;
+	height: 119px;
+	margin: 3pt;
 	text-align: center;
-	vertical-align: center;
-	padding-top: 50px;
+	position: relative;
 }
 #thumbscreen ul {
     list-style-type: none;
@@ -127,14 +132,14 @@ ul.articlelist li a:visited {
 }
 
 /* color classes for thumbscreen */
-.red { background-color: #f66; }
+.red { background-color: #a71e1e; }
 .white { background-color: #fff; }
-.blue { background-color: #66f; }
-.gray { background-color: #ccc; }
+.blue { background-color: #2608a4; }
+.gray { background-color: #272f27; }
   #thumbscreen .gray a, .gray a:visited { color: white; }
-.green { background-color: #cfc; }
-.yellow { background-color: #ff1; }
-.orange { background-color: #eea; }
+.green { background-color: #06660d; }
+.yellow { background-color: #ffd02b; color: black; }
+.orange { background-color: #dc7200; }
 
 /* responsive section */
 @media screen {
