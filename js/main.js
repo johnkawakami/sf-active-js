@@ -3,6 +3,11 @@
 var IMC = {};
 
 var layoutModule = function ($, EV) {
+	// module globals
+	var spinnerCounter = 0;
+	var breakingnewsCache = null;
+	var featureCache = null;
+	var localCache = null;
 
 	// display switcher
 	// fixme - need a global view switcher that will hide all, then reveal one
@@ -19,7 +24,7 @@ var layoutModule = function ($, EV) {
 		if (view==null || view=="") view='thum';
 		for (var v in views) {
 			if (v == view) {
-				$(views[v]).css('display','block');
+				$(views[v]).css('display', 'block');
 			} else {
 				$(views[v]).css('display', 'none');
 			}
@@ -27,6 +32,19 @@ var layoutModule = function ($, EV) {
 	};
 
 	
+  $("body").on({
+		ajaxStart: function() {
+		  spinnerCounter++;
+			$('#spinner').show();
+		},
+		ajaxStop: function() {
+		  spinnerCounter--;
+			if (spinnerCounter <= 0) {
+				$('#spinner').hide();
+			}
+		}
+	});
+
 	/** 
 	 * state change hander - routes all the URLs to the correct screen 
 	 * param 'v' picks a view
@@ -36,11 +54,10 @@ var layoutModule = function ($, EV) {
 		var state = History.getState();
 		var uri = new URI(state.url);	
 		var values = URI.parseQuery(uri.query());
-		console.log(values.v);
+
 		switch(values.v) {
 			case 'cont': 
 				if (values.url) {
-					console.log(values.url);
 					displaySwitcher(values.v);
 					if (localStorage[values.url] != null) {
 						var data = JSON.parse(localStorage[values.url]);
@@ -161,41 +178,35 @@ var layoutModule = function ($, EV) {
 
 	
 	// load up the local rss feed
-	$.getFeed({
-		url: 'proxy.php?url=http://la.indymedia.org/newswire.rss',
-		success: function(feed) {
-		  console.log(feed);
-		  var html = '<ul class="articlelist">';
-		  for(var i = 0; i < feed.items.length && i < 55; i++) {
-					var item = feed.items[i];
-					html += '<li><a href="?v=cont&url=' 
-					+ item.link.replace('.php','.json')
-					+ '">'
-					+ item.title
-					+ '</a></li>';
-		  }
-		  html = html + '</ul>';
-		  $('#local').append(html);
-		} 
-    });
+		$.getJSON(
+			'http://la.indymedia.org/js/regen.php?callback=?',
+			{ "s":"local" },
+			function(j) {
+				localCache = formatArticleList(j);
+				$('#local').append(localCache);
+			} 
+		);
+
 	// load up features
-	$.getJSON( 
-		'http://la.indymedia.org/js/regen.php?callback=?',
-		{ "s":"features" },
-		function(j) {
-			$('#feature').append( formatArticleList(j) );	
-		}
-	);
+		$.getJSON( 
+			'http://la.indymedia.org/js/regen.php?callback=?',
+			{ "s":"features" },
+			function(j) {
+				featureCache = formatArticleList(j);
+				$('#feature').append( featureCache );	
+			}
+		);
 	// load up the calendar
 	$('#calendar').append('calendar');
 	// load up breaking news
-	$.getJSON(
-		'http://la.indymedia.org/js/regen.php?callback=?',
-		{ "s": "breakingnews" },
-		function(j) {
-			$('#breakingnews').append( formatArticleList(j) );
-		}
-	);
+		$.getJSON(
+			'http://la.indymedia.org/js/regen.php?callback=?',
+			{ "s": "breakingnews" },
+			function(j) {
+				breakingnewsCache = formatArticleList(j);
+				$('#breakingnews').append( breakingnewsCache );
+			}
+		);
 	$('#publish').append('publish');
 
 }; // end of the layout module

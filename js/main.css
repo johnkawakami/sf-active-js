@@ -31,9 +31,9 @@ span.menu {
 body {
 	padding: 0;
 	margin: 0;
-	font-family: Lucida,"Lucida Sans","Lucida Sans Unicode","Lucida Grande";
-	color: #222;
-	background-color: #eee;
+	font-family: Lucida,"Lucida Sans","Lucida Sans Unicode","Lucida Grande", Helvetica, Arial, normal, sans-serif;
+	color: white;
+	background-color: black;
 }
 .region {
 	margin: 0;
@@ -44,32 +44,32 @@ body {
 	top: 0; left: 0;
 	width: 100%;
 	height: 80px;
-	background-color: #000;
-	color: black;
+	background-color: black;
+	border-bottom: 1px solid #222;
+	color: white;
 }
 #local, #feature {
-    margin: 2pt;
-    margin-top: 34pt;
+  margin: 2pt;
 	display: none;
-	background-color: white;
+	background-color: black;
+	color: white;
 }
 ul.articlelist {
-	margin-left: 0;
+	margin: 0;
 	padding-left: 0;
-    list-style-type: none;
+  list-style-type: none;
 }
 ul.articlelist li {
-	margin-top: 0;
 	padding: 1em;
 	border: none;
 	border-bottom: 1px solid #666;
 }
 ul.articlelist li a {
-	color: black;
+	color: white;
 	text-decoration: none;
 }
 ul.articlelist li a:visited {
-    color: #aaa;
+    color: #bbb;
     text-decoration: none;
 }
 #content {
@@ -78,7 +78,7 @@ ul.articlelist li a:visited {
 }
 #bottombar {
 	height: 20px;
-	background-color: lightblue;
+	background-color: black;
 	clear: both;
 }
 
@@ -127,14 +127,14 @@ ul.articlelist li a:visited {
 }
 
 /* color classes for thumbscreen */
-.red { background-color: #f66; background-image: url(images/red.jpg); }
+.red { background-color: #f66; }
 .white { background-color: #fff; }
-.blue { background-color: #66f; background-image: url(images/blue.jpg); }
-.gray { background-color: #ccc; background-image: url(images/gray.jpg);  }
+.blue { background-color: #66f; }
+.gray { background-color: #ccc; }
   #thumbscreen .gray a, .gray a:visited { color: white; }
-.green { background-color: #cfc; background-image: url(images/green.jpg); }
-.yellow { background-color: #ff1; background-image: url(images/yellow.jpg); }
-.orange { background-color: #eea;  background-image: url(images/orange.jpg); }
+.green { background-color: #cfc; }
+.yellow { background-color: #ff1; }
+.orange { background-color: #eea; }
 
 /* responsive section */
 @media screen {

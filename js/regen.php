@@ -77,7 +77,7 @@ function select_breakingnews() {
 	global $webcast, $max_stories;
 	load_webcast();
 	$count = 0;
-	// filter in status='l' and count to $max_stories
+	// filter in display='l' and count to $max_stories
 	$local = array_filter( $webcast,
 		function($a) use (&$count) {
 			global $max_stories;
@@ -230,7 +230,7 @@ function get_settings() {
 // convenience function to get a db connection
 function get_pdo_connection() {
 	global $dbhost, $dbname, $dbuser, $dbpass;
-	return new PDO( "mysql:dbname=$dbname;host=$dbhost", $dbuser, $dbpass );
+	return new PDO( "mysql:dbname=$dbname;host=$dbhost;charset=utf8", $dbuser, $dbpass );
 }
 
 

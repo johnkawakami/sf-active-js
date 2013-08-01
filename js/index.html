@@ -1,19 +1,10 @@
 <!DOCTYPE html>
 <html><!-- all javascript IMC pages -->
 <head>
-    <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0, maximum-scale=1.0" />
 	<script type="text/javascript" src="jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="jquery-migrate-1.2.1.js"></script>
-	<script type="text/javascript" src="mustache.js"></script>
-	<script type="text/javascript" src="encoder.js"></script>
-	<script type="text/javascript" src="jfeed.js"></script>
-	<script type="text/javascript" src="jrss.js"></script>
-	<script type="text/javascript" src="jquery.jfeed.js"></script>
-    <script type="text/javascript" src="URI.js"></script>
-    <script type="text/javascript" src="json2.js"></script>
-    <script type="text/javascript" src="history.js"></script>
-    <script type="text/javascript" src="history.adapter.jquery.js"></script>
-	<script type="text/javascript" src="qrcodejs/qrcode.js"></script>
+	<script type="text/javascript" src="jstorage.js"></script>
 	<script type="text/javascript" src="main.js"></script>
 	<link rel="stylesheet" href="main.css" />
 </head>
@@ -49,9 +40,20 @@
         <li id="bcomment" class="thumb orange"><a href="?v=comm">LATEST COMMENTS</a></li>
         <li id="bphoto" class="thumb yellow"><a href="?v=phot">LATEST PHOTOS</a></li>
     </ul>
+</div>
+<div id="spinner" align="center" style="background-color:black; display:none;">
 		<img src="images/clock.gif" />
 </div>
-
-<div id="bottombar" class="region">if you see this, it's loading. don't wrry, the photos are not final. it's a draft.</div>
+<div id="bottombar" class="region"></div>
+	<script type="text/javascript" src="mustache.js"></script>
+	<script type="text/javascript" src="encoder.js"></script>
+	<script type="text/javascript" src="jfeed.js"></script>
+	<script type="text/javascript" src="jrss.js"></script>
+	<script type="text/javascript" src="jquery.jfeed.js"></script>
+  <script type="text/javascript" src="URI.js"></script>
+  <script type="text/javascript" src="json2.js"></script>
+  <script type="text/javascript" src="history.js"></script>
+  <script type="text/javascript" src="history.adapter.jquery.js"></script>
+	<script type="text/javascript" src="qrcodejs/qrcode.js"></script>
 </body>
 </html>
