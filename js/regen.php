@@ -18,15 +18,23 @@
  *   assumed.
  */
 
+/* fixme - all instances of "feature" should be renamed to "features" 
+   including in the css and html */
+
 // machine-dependent configs
 if ( $_SERVER['HTTP_HOST'] == 'indymedia.lo' ) {
 	$sf_active_config_path = "/home/johnk/Sites/la.indymedia.org/local/config/sfactive.cfg";
+	$cache_path = '/tmp/json/';
 } else {
 	$sf_active_config_path = "/www/la.indymedia.org/local/config/sfactive.cfg";
+	$cache_path = '/www/la.indymedia.org/local/cache/';
 }
 
 // script configs
 $max_stories = 15;
+$total_stories = 1000;
+$max_events = 25;
+$cache_expire = 120; //seconds to expire
 
 // sf-active configs to import
 list( $dbhost, $dbname, $dbuser, $dbpass, $production_category_id ) = get_settings();
@@ -60,7 +68,7 @@ switch($select) {
 		$ouptut = json_encode(
 			array( 
 			    'local' => select_local(),
-				'features' => select_features($production_category_id),
+					'features' => select_features($production_category_id),
 			    'breakingnews' => select_breakingnews(),
 			    'calendar' => select_calendar()
 			)
@@ -74,7 +82,15 @@ if ($callback) echo ');';
 exit;
 
 function select_breakingnews() {
-	global $webcast, $max_stories;
+	global $webcast, $max_stories, $cache_path;
+	$cache_filename = 'breakingnews.json';
+	$cache_file = $cache_path . $cache_filename;
+
+	// check the cache
+	$output = read_cache_file( $cache_file );
+	if ($output != NULL) return $output;
+
+	// otherwise get data from the db
 	load_webcast();
 	$count = 0;
 	// filter in display='l' and count to $max_stories
@@ -97,6 +113,9 @@ function select_breakingnews() {
 	foreach($local as $l) {
 		$output[] = cleanup_webcast_row( $l );
 	}
+
+	write_cache_file( $cache_file, $output );
+
 	return $output;
 }
 
@@ -105,7 +124,13 @@ function select_calendar() {
 }
 
 function select_local() {
-	global $webcast, $max_stories;
+	global $webcast, $max_stories, $cache_path;
+	$cache_filename = 'local.json';
+	$cache_file = $cache_path . $cache_filename;
+
+	$output = read_cache_file( $cache_file );
+	if ($output != NULL) return $output;
+
 	load_webcast();
 	$count = 0;
 	// filter in status='l' and count to $max_stories
@@ -126,6 +151,9 @@ function select_local() {
 	foreach($local as $l) {
 		$output[] = cleanup_webcast_row( $l );
 	}
+
+	write_cache_file( $cache_file, $output );
+
 	return $output;
 }
 
@@ -142,7 +170,6 @@ function cleanup_webcast_row( $l ) {
 		'url' => "/news/$y/$m/$id.json",
 		'date'=> "$y/$m/$d"
 	);
-	
 }
 // cache a copy of last 1000 webcast posts, so we do only one sql query
 function load_webcast() {
@@ -168,8 +195,13 @@ function load_webcast() {
 
 // home page features list
 function select_features( $category_id ) {
+	global $cache_path;
+	$cache_file = $cache_path . 'features.json';
+	$output = read_cache_file( $cache_file );
+	if ($output != NULL) return $output;
+
 	$home_page_features_sql = 
-	    "SELECT feature_id, title2 as title, display_date as date, order_num
+	  "SELECT feature_id, title2 as title, display_date as date, order_num
 		FROM feature 
 		WHERE is_current_version=1 
 		AND status='c'
@@ -206,10 +238,33 @@ function select_features( $category_id ) {
 			return $b;
 		},
 		$features );
+
+	write_cache_file( $cache_file, $features );
+	
 	return $features;
 }
 
 // UTILITIES
+
+/* cache checking functions */
+
+function read_cache_file( $file ) {
+	global $cache_expire;
+	$stat = stat( $file );
+	if ($stat === FALSE) return FALSE;
+	if ($stat['mtime'] + $cache_expire > time()) {
+		$output = file_get_contents( $file );
+		return unserialize($output);
+	}
+	return FALSE;
+}
+
+function write_cache_file( $file, $data ) {
+	global $cache_path;
+	mkdir( $cache_path, 0777, TRUE );
+	$result = file_put_contents( $file, serialize($data), LOCK_EX );
+	if ($result === FALSE) die();
+}
 
 /* rather than use the db library, we just extract the values from the 
  * config file

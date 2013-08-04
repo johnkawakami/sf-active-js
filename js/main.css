@@ -3,6 +3,7 @@
 h2 {
     margin-bottom: 0.25em;
     padding-bottom: 0em;
+		color: white;
 }
 p.byline {
 	margin-top: 0px;
@@ -83,7 +84,7 @@ ul.articlelist li a:visited {
 }
 
 #heading {
-	color: black;
+	color: white;
 }
 #summary {
 	font-style: italic;
