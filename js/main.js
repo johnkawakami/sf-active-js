@@ -35,12 +35,12 @@ var layoutModule = function ($, EV) {
   $("body").on({
 		ajaxStart: function() {
 		  spinnerCounter++;
-			$('#spinner').show();
+			$('#spinner').attr('src','images/spinner_black.gif');
 		},
 		ajaxStop: function() {
 		  spinnerCounter--;
 			if (spinnerCounter <= 0) {
-				$('#spinner').hide();
+				$('#spinner').attr('src','images/black.gif');
 			}
 		}
 	});
@@ -174,7 +174,7 @@ var layoutModule = function ($, EV) {
 	
 	// load up the local rss feed
 		$.getJSON(
-			'http://la.indymedia.org/js/regen.php?callback=?',
+			'http://la.indymedia.org/js/ws/regen.php?callback=?',
 			{ "s":"local" },
 			function(j) {
 				localCache = formatArticleList(j);
@@ -184,7 +184,7 @@ var layoutModule = function ($, EV) {
 
 	// load up features
 		$.getJSON( 
-			'http://la.indymedia.org/js/regen.php?callback=?',
+			'http://la.indymedia.org/js/ws/regen.php?callback=?',
 			{ "s":"features" },
 			function(j) {
 				featureCache = formatArticleList(j);
@@ -195,7 +195,7 @@ var layoutModule = function ($, EV) {
 	$('#calendar').append('calendar');
 	// load up breaking news
 		$.getJSON(
-			'http://la.indymedia.org/js/regen.php?callback=?',
+			'http://la.indymedia.org/js/ws/regen.php?callback=?',
 			{ "s": "breakingnews" },
 			function(j) {
 				breakingnewsCache = formatArticleList(j);
@@ -292,7 +292,7 @@ var SettingsIconFactory = function($,id) {
 
 // converts a regular url into a url pulled by the local proxy script
 var getProxyUrl = function(url) {
-	return "/js/proxy.php?url=" +  escape(url);
+	return "/js/ws/proxy.php?url=" +  escape(url);
 };
 
 //start of application

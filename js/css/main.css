@@ -1,5 +1,9 @@
 /* @import url(http://fonts.googleapis.com/css?family=Libre+Baskerville:400,400italic,700); */
 
+html { 
+	overflow: scrollbars-vertical;
+	overflow-y: scroll;
+}
 h2 {
     margin-bottom: 0.25em;
     padding-bottom: 0em;
@@ -32,7 +36,7 @@ span.menu {
 body {
 	padding: 0;
 	margin: 0;
-	font-family: Lucida,"Lucida Sans","Lucida Sans Unicode","Lucida Grande", Helvetica, Arial, normal, sans-serif;
+	font-family: 'Roboto',Lucida,"Lucida Sans","Lucida Sans Unicode","Lucida Grande", Helvetica, Arial, normal, sans-serif;
 	color: white;
 	background-color: black;
 }

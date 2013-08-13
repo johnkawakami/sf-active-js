@@ -2,18 +2,18 @@
 <html><!-- all javascript IMC pages -->
 <head>
   <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0, maximum-scale=1.0" />
-	<script type="text/javascript" src="jquery-1.9.1.min.js"></script>
-	<script type="text/javascript" src="jquery-migrate-1.2.1.js"></script>
-	<script type="text/javascript" src="jstorage.js"></script>
+	<script type="text/javascript" src="vendor/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="vendor/jquery-migrate-1.2.1.js"></script>
+	<script type="text/javascript" src="vendor/jstorage.js"></script>
 	<script type="text/javascript" src="main.js"></script>
-	<link rel="stylesheet" href="main.css" />
+	<link rel="stylesheet" href="css/main.css" />
 </head>
 <body>
 <div id="topbar">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 		<tr>
 			<td><img id="thumbscreenbutton" src="images/menu-black.png" border="0" /></td>
-			<td style="color:white" align="center">la.indymedia.org</td>
+			<td style="color:white" align="center"><img id="spinner" src="images/black.gif" width="16" height="16" /> la.indymedia.org</td>
 			<td align="right"><img src="images/settings-black.png" /></td>
 		</tr>
 	</table>
@@ -41,19 +41,16 @@
         <li id="bphoto" class="thumb yellow"><span class="label">LATEST PHOTOS</span></li>
     </ul>
 </div>
-<div id="spinner" align="center" style="background-color:black; display:none;">
-		<img src="images/clock.gif" />
-</div>
 <div id="bottombar" class="region"></div>
-	<script type="text/javascript" src="mustache.js"></script>
-	<script type="text/javascript" src="encoder.js"></script>
-	<script type="text/javascript" src="jfeed.js"></script>
-	<script type="text/javascript" src="jrss.js"></script>
-	<script type="text/javascript" src="jquery.jfeed.js"></script>
-  <script type="text/javascript" src="URI.js"></script>
-  <script type="text/javascript" src="json2.js"></script>
-  <script type="text/javascript" src="history.js"></script>
-  <script type="text/javascript" src="history.adapter.jquery.js"></script>
-	<script type="text/javascript" src="qrcodejs/qrcode.js"></script>
+	<script type="text/javascript" src="vendor/mustache.js"></script>
+	<script type="text/javascript" src="vendor/encoder.js"></script>
+	<script type="text/javascript" src="vendor/jfeed.js"></script>
+	<script type="text/javascript" src="vendor/jrss.js"></script>
+	<script type="text/javascript" src="vendor/jquery.jfeed.js"></script>
+  <script type="text/javascript" src="vendor/URI.js"></script>
+  <script type="text/javascript" src="vendor/json2.js"></script>
+  <script type="text/javascript" src="vendor/history.js"></script>
+  <script type="text/javascript" src="vendor/history.adapter.jquery.js"></script>
+	<script type="text/javascript" src="vendor/qrcodejs/qrcode.js"></script>
 </body>
 </html>
