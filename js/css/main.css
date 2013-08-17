@@ -136,6 +136,14 @@ ul.articlelist li a:visited {
 	color: black;
 }
 
+.noselect {
+  -webkit-user-select: none;  
+  -moz-user-select: none;    
+  -ms-user-select: none;      
+  user-select: none;
+  cursor: pointer;
+}
+
 /* color classes for thumbscreen */
 .red { background-color: #a71e1e; }
 .white { background-color: #fff; }

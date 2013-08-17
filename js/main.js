@@ -183,6 +183,7 @@ var layoutModule = function ($, EV) {
 		function(j) {
 			localCache = formatArticleList(j);
 			$('#local').append(localCache);
+			attachArticleListClickHandler( j );
 		} 
 	);
 
@@ -192,7 +193,8 @@ var layoutModule = function ($, EV) {
 		{ "s":"features" },
 		function(j) {
 			featureCache = formatArticleList(j);
-			$('#feature').append( featureCache );	
+			$('#feature').append( featureCache );
+			attachArticleListClickHandler( j );
 		}
 	);
 	// load up the calendar
@@ -204,18 +206,22 @@ var layoutModule = function ($, EV) {
 		function(articles) {
 			breakingnewsCache = formatArticleList(articles);
 			$('#breakingnews').append( breakingnewsCache );
-			for(var i=0; i < articles.length; i++) {
-				$('#id-'+articles[i].id).on(
-					'click',
-					new Function('History.pushState(null,"local","?v=cont&url=http://la.indymedia.org'+articles[i].url+'")') 
-					);
-			}
+			attachArticleListClickHandler( articles );
 		}
 	);
 	$('#publish').append('publish');
 
 }; // end of the layout module
 
+var attachArticleListClickHandler = function(articles) {
+	for(var i=0; i < articles.length; i++) {
+		var row = $('#id-'+articles[i].id);
+		row.on('click',
+			new Function('History.pushState(null,"local","?v=cont&url=http://la.indymedia.org'+articles[i].url+'")') 
+			);
+		row.html(row.contents().text()); // replaces link with title text
+	}
+}
 /**
  * json: an array of article link objects
  */
@@ -227,7 +233,7 @@ var formatArticleList = function(json) {
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];
-		html += '<li id="id-'+j.id+'"><a href="?v=cont&url=http://la.indymedia.org' 
+		html += '<li id="id-'+j.id+'" class="noselect"><a href="?v=cont&url=http://la.indymedia.org' 
 		+ j.url
 		+ '">'
 		+ j.title
