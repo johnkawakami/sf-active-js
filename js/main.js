@@ -58,21 +58,17 @@ var layoutModule = function ($, EV) {
 		switch(values.v) {
 			case 'cont': 
 				if (values.url) {
+					clearContent();
 					displaySwitcher(values.v);
-					if (localStorage[values.url] != null) {
-						var data = JSON.parse(localStorage[values.url]);
-						insertStory( data.article );
-						insertAttachments( data.attachments );
-						insertComments( data.comments );				
-					} else {
-						$.getJSON( getProxyUrl(values.url) ).done(function (data, error) {
+					$.getJSON( getProxyUrl(values.url) ).done(
+						function (d, error) {
+							console.log("called loader");
 							if (error!='success') alert(error);
-							insertStory( data.article );
-							insertAttachments( data.attachments );
-							insertComments( data.comments );
-							localStorage[values.url] = JSON.stringify(data);
-						});
-					}
+							insertStory( d.article );
+							insertAttachments( d.attachments );
+							insertComments( d.comments );
+						}
+					); //done
 				}
 				break;				
 			case 'loca':
@@ -90,6 +86,14 @@ var layoutModule = function ($, EV) {
 	};
 
     // utitiles to fill in the layout
+    var clearContent = function() {
+    	$('#heading').html('');
+    	$('#summary').html('');
+    	$('#author').html('');
+    	$('#article').html('');
+    	$('#attachments').html('');
+    	$('#comments').html('');
+    };
 	var insertStory = function(d) {
 		$('#heading').html(d.heading);
 		$('#summary').html(d.summary);
@@ -103,7 +107,7 @@ var layoutModule = function ($, EV) {
 	var insertAttachments = function(d) {
 		var att = $('#attachments');
 		var i = 0;
-		var template = '<div id="article-{{i}}"><h2>{{heading}}</h2><p class="byline">by {{{author}}}</p><p>{{{article}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" class="photo" /></a></p></div>';
+		var template = '<div id="article-{{i}}"><h2>{{heading}}</h2><p class="byline">by {{{author}}}<br />{{{format_created}}}</p><p>{{{article}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" class="photo" /></a></p></div>';
 		// if (d.length == 0) return; // bail out on empty
 		att.html(''); // clear them
 		d.forEach( 
@@ -117,12 +121,12 @@ var layoutModule = function ($, EV) {
 						a.article = a.article.replace( /^by .*$/m, '' );
 					}
 					var text = Mustache.render( template, a );
-					att.prepend( text );
+					att.append( text );
 				}
 		);
 	};
 	var insertComments = function(d) {
-	  var commentTemplate = '<div id="article-{{i}}"><h2>{{heading}}</h2><p>by {{{author}}}</p>{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
+	  var commentTemplate = '<div id="article-{{i}}"><h2>{{heading}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
 	  var comm = $('#comments');
 	  comm.html(''); // clear it out
 	  for(var i=0;i<d.length;i++) {
@@ -145,17 +149,17 @@ var layoutModule = function ($, EV) {
 	// draw features
 
 	// attach actions to buttons
-  $('#thumbscreenbutton').on('click',function(){History.pushState(null,"thumbscreen","?v=thum")});
-  $('#blocal'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
+	$('#thumbscreenbutton').on('click',function(){History.pushState(null,"thumbscreen","?v=thum")});
+	$('#blocal'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
 	$('#bbreaking').on('click',function(){History.pushState(null,"breaking news","?v=brea")});
 	$('#bcalendar').on('click',function(){History.pushState(null,"calendar","?v=cale")});
 	$('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat")});
 	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
 
 	// attach state handlers for history
-    History.Adapter.bind(window, 'statechange', displayFromQuery);
-    // for starters, call the handler
-    displayFromQuery();
+        History.Adapter.bind(window, 'statechange', displayFromQuery);
+        // for starters, call the handler
+        displayFromQuery();
 
 	// create a shortened url for the long url
 	/*
@@ -173,35 +177,41 @@ var layoutModule = function ($, EV) {
 
 	
 	// load up the local rss feed
-		$.getJSON(
-			'http://la.indymedia.org/js/ws/regen.php?callback=?',
-			{ "s":"local" },
-			function(j) {
-				localCache = formatArticleList(j);
-				$('#local').append(localCache);
-			} 
-		);
+	$.getJSON(
+		'http://la.indymedia.org/js/ws/regen.php?callback=?',
+		{ "s":"local" },
+		function(j) {
+			localCache = formatArticleList(j);
+			$('#local').append(localCache);
+		} 
+	);
 
 	// load up features
-		$.getJSON( 
-			'http://la.indymedia.org/js/ws/regen.php?callback=?',
-			{ "s":"features" },
-			function(j) {
-				featureCache = formatArticleList(j);
-				$('#feature').append( featureCache );	
-			}
-		);
+	$.getJSON( 
+		'http://la.indymedia.org/js/ws/regen.php?callback=?',
+		{ "s":"features" },
+		function(j) {
+			featureCache = formatArticleList(j);
+			$('#feature').append( featureCache );	
+		}
+	);
 	// load up the calendar
 	$('#calendar').append('calendar');
 	// load up breaking news
-		$.getJSON(
-			'http://la.indymedia.org/js/ws/regen.php?callback=?',
-			{ "s": "breakingnews" },
-			function(j) {
-				breakingnewsCache = formatArticleList(j);
-				$('#breakingnews').append( breakingnewsCache );
+	$.getJSON(
+		'http://la.indymedia.org/js/ws/regen.php?callback=?',
+		{ "s": "breakingnews" },
+		function(articles) {
+			breakingnewsCache = formatArticleList(articles);
+			$('#breakingnews').append( breakingnewsCache );
+			for(var i=0; i < articles.length; i++) {
+				$('#id-'+articles[i].id).on(
+					'click',
+					new Function('History.pushState(null,"local","?v=cont&url=http://la.indymedia.org'+articles[i].url+'")') 
+					);
 			}
-		);
+		}
+	);
 	$('#publish').append('publish');
 
 }; // end of the layout module
@@ -210,14 +220,14 @@ var layoutModule = function ($, EV) {
  * json: an array of article link objects
  */
 var formatArticleList = function(json) {
-		if (json == null) {
-			console.log("json is null");
-			return;
-		}
+	if (json == null) {
+		console.log("json is null");
+		return;
+	}
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];
-		html += '<li><a href="?v=cont&url=http://la.indymedia.org' 
+		html += '<li id="id-'+j.id+'"><a href="?v=cont&url=http://la.indymedia.org' 
 		+ j.url
 		+ '">'
 		+ j.title

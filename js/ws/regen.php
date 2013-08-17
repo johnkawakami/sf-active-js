@@ -64,15 +64,8 @@ switch($select) {
 	case 'local': 
 		$output = json_encode( select_local() );
 	break;
-	case 'combo':  // all the feeds in one
-		$ouptut = json_encode(
-			array( 
-			    'local' => select_local(),
-					'features' => select_features($production_category_id),
-			    'breakingnews' => select_breakingnews(),
-			    'calendar' => select_calendar()
-			)
-		);
+	case 'combined':  // all the feeds in one
+		$output = json_encode( select_combined() );
 	break;
 }
 header('Content-Type: text/javascript');
@@ -80,6 +73,26 @@ if ($callback) echo $callback . '(';
 echo $output; 
 if ($callback) echo ');';
 exit;
+
+function select_combined() {
+	global $max_stories, $cache_path;
+	$cache_filename = 'combined.json';
+	$cache_file = $cache_path . $cache_filename;
+
+	$output = read_cache_file( $cache_file );
+	if ($output != NULL) return $output;
+	
+	$output = array(
+	    'local' => select_local(),
+	    'features' => select_features($production_category_id),
+	    'breakingnews' => select_breakingnews(),
+	    'calendar' => select_calendar()
+	);
+
+	write_cache_file( $cache_file, $output );
+
+	return $output;
+}
 
 function select_breakingnews() {
 	global $webcast, $max_stories, $cache_path;
@@ -120,7 +133,31 @@ function select_breakingnews() {
 }
 
 function select_calendar() {
-	return array();
+	global $webcast, $max_stories, $cache_path;
+	$cache_filename = 'calendar.json';
+	$cache_file = $cache_path . $cache_filename;
+
+	$output = read_cache_file( $cache_file );
+	if ($output != NULL) return $output;
+
+	$today = '';
+	$sql = "SELECT event_id, start_date, duration, title, location_details, 
+		contact_name, contact_phone, contact_email, description, 
+		artmime, linked_file, mime_type 
+		FROM event 
+		WHERE unix_timestamp(start_date) > unix_timestamp(now()) - (24*60*60*1) 
+		ORDER BY state_date ASC
+		";
+	try {
+		$db = get_pdo_connection();
+		$sth = $db->prepare( $sql );
+		$sth->execute( array("today"=>$today) );
+		$webcast = $sth->fetchAll( PDO::FETCH_ASSOC );
+	} catch(PDOException $e) {
+		die( $e->getMessage() );
+	}
+	// do some sorting - fixme
+	return $webcast;
 }
 
 function select_local() {

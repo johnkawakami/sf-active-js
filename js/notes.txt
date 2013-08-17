@@ -1,0 +1,20 @@
+break out the data loading stuff into some kind of object that
+takes requests and fetches the data, handles failures a little bit
+more cleanly - like if something fails, either try again, or notify
+the user of the problem and allow them to refresh.
+
+it should be possible to fire off multiple requests and wait for all of
+them.  we must avoid page reloads at all times.
+
+alter the article lists so they don't have A tags.  just use onclick
+handlers with paramters that specify the urls.
+
+if a request is failing, and something is clicked, what happens?
+does it launch another request?  i'm kind of lost here.
+
+i need software that will slow down the web and simulate a bad 
+mobile phone internet link.
+
+get lists of fonts so i can start on a settings screen.
+
+
