@@ -29,6 +29,9 @@ if ( $_SERVER['HTTP_HOST'] == 'indymedia.lo' ) {
 	$sf_active_config_path = "/www/la.indymedia.org/local/config/sfactive.cfg";
 	$cache_path = '/www/la.indymedia.org/local/cache/';
 }
+$upload_root = array();
+$upload_root[] = '/mnt/ad3/usr/local/www-domains/la.indymedia.org/public/uploads';
+$upload_root[] = '/usr/local/sf-active/la.indymedia.org/public/uploads';
 
 // script configs
 $max_stories = 15;
@@ -114,8 +117,8 @@ function select_breakingnews() {
 			if ($a['display']=='t' 
 				and $a['parent_id']==0 
 				and $a['heading']!=null ) {
-				$count++;
-				return true;
+					$count++;
+					return true;
 			}
 			return false;
 		}
@@ -133,7 +136,7 @@ function select_breakingnews() {
 }
 
 function select_calendar() {
-	global $webcast, $max_stories, $cache_path;
+	global $webcast, $max_stories, $cache_path, $upload_root;
 	$cache_filename = 'calendar.json';
 	$cache_file = $cache_path . $cache_filename;
 
@@ -141,23 +144,82 @@ function select_calendar() {
 	if ($output != NULL) return $output;
 
 	$today = '';
-	$sql = "SELECT event_id, start_date, duration, title, location_details, 
+	$sql = 
+		"SELECT event_id AS id, start_date, duration, title, location_details AS location, 
 		contact_name, contact_phone, contact_email, description, 
 		artmime, linked_file, mime_type 
 		FROM event 
-		WHERE unix_timestamp(start_date) > unix_timestamp(now()) - (24*60*60*1) 
-		ORDER BY state_date ASC
+		WHERE unix_timestamp(start_date) > unix_timestamp(now()) - 100*(24*60*60*1) 
+		ORDER BY start_date ASC
 		";
 	try {
 		$db = get_pdo_connection();
 		$sth = $db->prepare( $sql );
 		$sth->execute( array("today"=>$today) );
-		$webcast = $sth->fetchAll( PDO::FETCH_ASSOC );
+		$events = $sth->fetchAll( PDO::FETCH_ASSOC );
 	} catch(PDOException $e) {
 		die( $e->getMessage() );
 	}
-	// do some sorting - fixme
-	return $webcast;
+	// Mangle the result into something that looks more like an article or an email,
+	// which is some metadata, a text body, and one or more attachments.
+	$output = [];
+	foreach( $events as $event )
+	{
+		$event['url'] = '/calendar/?id=' . $event['id'];
+
+		// Convert the start_date and duration to start and end.
+		$start = $event['start_date'];
+		$duration = $event['duration'];
+		$fmt =  'Y-m-d G:i:s';
+		$end = DateTime::createFromFormat( $fmt, $start );
+		if ($end === FALSE) die("bad date $start");
+		$end->add( new DateInterval( "PT{$duration}M" ));
+		unset($event['start_date']);
+		unset($event['duration']);
+		$event['start'] = $start;
+		$event['end'] = $end->format( $fmt );
+
+		// If the artmime is text, convert to html.
+		if ($event['artmime']=='t') {
+			$event['description'] = preg_replace( '/\r\n/', '<br />', $event['description'] );
+		}
+
+		// Delete artmime field.
+		unset($event['artmime']);
+
+		// Convert attachment into an array of attachments
+		// of form [{"title":"", "body":"", "type":"application/pdf", "url":"url..."}]
+		$file = $event['linked_file'];
+		foreach( $upload_root as $ur ) {
+			$file = str_replace( $ur, '', $file );
+		}
+		$type = $event['mime_type'];
+		$event['attachments'] = array();
+		$event['attachments'][] = array(
+			'title' => '',
+			'body' => '',
+			'type' => $type,
+			'url' => $file
+		);
+		unset( $event['linked_file'] );
+		unset( $event['mime_type'] );
+
+		// Convert contact info into an array of contacts.
+		$event['contacts'] = array();
+		$event['contacts'][] = array( 
+			'name' => $event['contact_name'],
+			'email' => $event['contact_email'],
+			'phone' => $event['contact_phone']
+		);
+		unset($event['contact_name']);
+		unset($event['contact_email']);
+		unset($event['contact_phone']);
+
+		// Field names are: id, title, url, start, end, contacts, attachments
+
+		$output[] = $event;
+	}
+	return $output;
 }
 
 function select_local() {
@@ -208,7 +270,11 @@ function cleanup_webcast_row( $l ) {
 		'date'=> "$y/$m/$d"
 	);
 }
-// cache a copy of last 1000 webcast posts, so we do only one sql query
+
+
+function format_as_html( $s ) { return $s; }
+
+// cache a copy of last 1000 webcast posts in memory, so we do only one sql query
 function load_webcast() {
 	global $webcast;
 	if ($webcast) return;
@@ -228,7 +294,6 @@ function load_webcast() {
 		die( $e->getMessage() );
 	}
 }
-
 
 // home page features list
 function select_features( $category_id ) {
@@ -263,15 +328,16 @@ function select_features( $category_id ) {
 			return 1; 
 		}
 	);
+	// mangle the features to resemble news stories
 	$features = array_map( 
 		function($a) {
 			$b = array();
 			$b['id'] = $a['feature_id'];
-			$b['url'] = '/cache/';
 			$b['title'] = $a['title'];
 			$b['date'] = substr($a['date'],6,4).'/'.
 			             substr($a['date'],0,2).'/'.
 			             substr($a['date'],3,2);
+			$b['url'] = '/features/'+$b['date']+'/'+$b['id']+'.json';
 			return $b;
 		},
 		$features );

@@ -144,6 +144,13 @@ ul.articlelist li a:visited {
   cursor: pointer;
 }
 
+/* calendar */
+.eventdate {
+	font-size: 80%;
+	color: #ddd;
+	margin-left: 5pt;
+}
+
 /* color classes for thumbscreen */
 .red { background-color: #a71e1e; }
 .white { background-color: #fff; }

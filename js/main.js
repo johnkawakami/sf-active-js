@@ -143,7 +143,7 @@ var layoutModule = function ($, EV) {
 	  }
 	};
 	// draw the calendar
-	// draw a list of stuff (move the rss feed code here)
+	// draw a list of stuf
 	// draw local
 	// draw breaking news
 	// draw features
@@ -157,9 +157,9 @@ var layoutModule = function ($, EV) {
 	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
 
 	// attach state handlers for history
-        History.Adapter.bind(window, 'statechange', displayFromQuery);
-        // for starters, call the handler
-        displayFromQuery();
+  History.Adapter.bind(window, 'statechange', displayFromQuery);
+  // for starters, call the handler
+  displayFromQuery();
 
 	// create a shortened url for the long url
 	/*
@@ -176,7 +176,7 @@ var layoutModule = function ($, EV) {
     
 
 	
-	// load up the local rss feed
+	// load up the local feed
 	$.getJSON(
 		'http://la.indymedia.org/js/ws/regen.php?callback=?',
 		{ "s":"local" },
@@ -198,7 +198,15 @@ var layoutModule = function ($, EV) {
 		}
 	);
 	// load up the calendar
-	$('#calendar').append('calendar');
+	$.getJSON( 
+		'/js/ws/regen.php?callback=?',
+		{ "s":"calendar" },
+		function(j) {
+			calendarCache = formatCalendarList(j);
+			$('#calendar').append( calendarCache );
+			attachCalendarListClickHandler( j );
+		}
+	);
 	// load up breaking news
 	$.getJSON(
 		'http://la.indymedia.org/js/ws/regen.php?callback=?',
@@ -222,6 +230,16 @@ var attachArticleListClickHandler = function(articles) {
 		row.html(row.contents().text()); // replaces link with title text
 	}
 }
+var attachCalendarListClickHandler = function(articles) {
+	for(var i=0; i < articles.length; i++) {
+		var row = $('#id-'+articles[i].id);
+		row.on('click',
+			new Function('History.pushState(null,"local","?v=cont&url=http://indymedia.lo'+articles[i].url+'")') 
+			);
+		var link = $('#id-'+articles[i].id + " a");
+		link.html(link.contents().text()); // replaces link with title text
+	}
+}
 /**
  * json: an array of article link objects
  */
@@ -238,6 +256,26 @@ var formatArticleList = function(json) {
 		+ '">'
 		+ j.title
 		+ '</a></li>';
+	  }
+	  html = html + '</ul>';	
+	  return html;
+};
+
+var formatCalendarList = function(json) {
+	if (json == null) {
+		console.log("json is null");
+		return;
+	}
+	  var html = '<ul class="articlelist">';
+	  for(var i = 0; i < json.length ; i++) {
+	  	j = json[i];
+			html += '<li id="id-'+j.id+'" class="noselect"><a href="?v=cont&url=http://la.indymedia.org' 
+			+ j.url
+			+ '">'
+			+ j.title
+			+ '</a>'
+			+ "<br />&nbsp;<span class='eventdate'>" + j.start 
+			+ '</span></li>';
 	  }
 	  html = html + '</ul>';	
 	  return html;
@@ -308,7 +346,11 @@ var SettingsIconFactory = function($,id) {
 
 // converts a regular url into a url pulled by the local proxy script
 var getProxyUrl = function(url) {
-	return "/js/ws/proxy.php?url=" +  escape(url);
+	if (document.location.href.match('indymedia.lo')) {
+		return "/js/ws/proxy.php?url=" +  escape(url);
+	} else {
+		return url;
+	}
 };
 
 //start of application
