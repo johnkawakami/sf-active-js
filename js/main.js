@@ -176,47 +176,34 @@ var layoutModule = function ($, EV) {
     
 
 	
-	// load up the local feed
+	// load up headlines from the server
 	$.getJSON(
 		'http://la.indymedia.org/js/ws/regen.php?callback=?',
-		{ "s":"local" },
+		{ "s":"combined" },
 		function(j) {
-			localCache = formatArticleList(j);
-			$('#local').append(localCache);
-			attachArticleListClickHandler( j );
+			local = j["local"];
+			feature = j["features"];
+			calendar = j["calendar"];
+			breakingnews = j["breakingnews"];
+
+			localCache = formatArticleList( local );
+			$('#local').append( localCache );
+			attachArticleListClickHandler( local );
+
+			breakingnewsCache = formatArticleList( breakingnews );
+			$('#breakingnews').append( breakingnewsCache );
+			attachArticleListClickHandler( breakingnews );
+
+			calendarCache = formatCalendarList( calendar );
+			$('#calendar').append( calendarCache );
+			attachCalendarListClickHandler( calendar );
+
+			featureCache = formatArticleList( feature );
+			$('#feature').append( featureCache );
+			attachArticleListClickHandler( feature );
 		} 
 	);
 
-	// load up features
-	$.getJSON( 
-		'http://la.indymedia.org/js/ws/regen.php?callback=?',
-		{ "s":"features" },
-		function(j) {
-			featureCache = formatArticleList(j);
-			$('#feature').append( featureCache );
-			attachArticleListClickHandler( j );
-		}
-	);
-	// load up the calendar
-	$.getJSON( 
-		'/js/ws/regen.php?callback=?',
-		{ "s":"calendar" },
-		function(j) {
-			calendarCache = formatCalendarList(j);
-			$('#calendar').append( calendarCache );
-			attachCalendarListClickHandler( j );
-		}
-	);
-	// load up breaking news
-	$.getJSON(
-		'http://la.indymedia.org/js/ws/regen.php?callback=?',
-		{ "s": "breakingnews" },
-		function(articles) {
-			breakingnewsCache = formatArticleList(articles);
-			$('#breakingnews').append( breakingnewsCache );
-			attachArticleListClickHandler( articles );
-		}
-	);
 	$('#publish').append('publish');
 
 }; // end of the layout module

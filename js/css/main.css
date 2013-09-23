@@ -120,6 +120,8 @@ ul.articlelist li a:visited {
 	margin: 3pt;
 	text-align: center;
 	position: relative;
+	-android-border-radius: 5dip;
+	border-radius: 3px;
 }
 #thumbscreen ul {
     list-style-type: none;
@@ -156,10 +158,13 @@ ul.articlelist li a:visited {
 .white { background-color: #fff; }
 .blue { background-color: #2608a4; }
 .gray { background-color: #272f27; }
-  #thumbscreen .gray a, .gray a:visited { color: white; }
+#thumbscreen .gray a, .gray a:visited { color: white; }
 .green { background-color: #06660d; }
 .yellow { background-color: #ffd02b; color: black; }
 .orange { background-color: #dc7200; }
+
+/* shape classes for thumbscreen */
+.round { border-radius: 50% !important; }
 
 /* responsive section */
 @media screen {

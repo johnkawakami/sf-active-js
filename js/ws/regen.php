@@ -46,7 +46,7 @@ list( $dbhost, $dbname, $dbuser, $dbpass, $production_category_id ) = get_settin
 $webcast = NULL;
 
 // JSONP support
-if ($_GET['callback']) {
+if (isset($_GET['callback'])) {
 	$callback = $_GET['callback'];
 } else {
 	$callback = false;
@@ -55,6 +55,8 @@ if ($_GET['callback']) {
 // parameter s selects which data to get
 $select = $_GET['s'];
 switch($select) {
+  // the individual selects are going to be deprecated
+	// the combined is all we should use
 	case 'features': 
 		$output = json_encode( select_features($production_category_id) );
 	break;
@@ -78,7 +80,7 @@ if ($callback) echo ');';
 exit;
 
 function select_combined() {
-	global $max_stories, $cache_path;
+	global $max_stories, $cache_path, $production_category_id;
 	$cache_filename = 'combined.json';
 	$cache_file = $cache_path . $cache_filename;
 
@@ -149,7 +151,7 @@ function select_calendar() {
 		contact_name, contact_phone, contact_email, description, 
 		artmime, linked_file, mime_type 
 		FROM event 
-		WHERE unix_timestamp(start_date) > unix_timestamp(now()) - 100*(24*60*60*1) 
+		WHERE unix_timestamp(start_date) > unix_timestamp(now()) - (24*60*60*1) 
 		ORDER BY start_date ASC
 		";
 	try {
@@ -162,7 +164,10 @@ function select_calendar() {
 	}
 	// Mangle the result into something that looks more like an article or an email,
 	// which is some metadata, a text body, and one or more attachments.
-	$output = [];
+	// Overall, this needs a lot of refactoring.  One version of this needs to 
+	// be used to generate a JSON file for each calendar item.  This version 
+	// needs to deliver only the title and time information, and maybe location info.
+	$output = array();
 	foreach( $events as $event )
 	{
 		$event['url'] = '/calendar/?id=' . $event['id'];
@@ -214,6 +219,7 @@ function select_calendar() {
 		unset($event['contact_name']);
 		unset($event['contact_email']);
 		unset($event['contact_phone']);
+		unset($event['description']);
 
 		// Field names are: id, title, url, start, end, contacts, attachments
 
