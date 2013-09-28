@@ -40,6 +40,9 @@ body {
 	color: white;
 	background-color: black;
 }
+a {
+	color: #8888ff;
+}
 .region {
 	margin: 0;
 	padding: 10pt;
