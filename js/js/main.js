@@ -142,11 +142,33 @@ var layoutModule = function ($, EV) {
 			comm.append( text );
 	  }
 	};
-	// draw the calendar
-	// draw a list of stuf
-	// draw local
-	// draw breaking news
-	// draw features
+
+	// Swaps in different css files.  
+	// For now, loads in the theme parts individually, but eventually, we will be constructing the
+	// url from the cookie values of these different settings.  So they'll have names like 
+	// theme-1-5-2.css.  There are potentialy dozens or hundreds of css files, each very short, like < 1k.
+	// I should be using an ID attribute on the link tags. -fixme
+	var setCSS = function() {
+		var color, font, size;
+		color = $('#color').val();
+		font = $('#font').val();
+		fontsize = $('#fontsize').val();
+		console.log( " " + color + font + fontsize );
+		var links = document.getElementsByTagName('link');
+		links[1].href='css/src/color'+color+'.css'
+		links[2].href='css/src/font'+font+'.css'
+		links[3].href='css/src/fontsize'+fontsize+'.css'
+	}
+	var closeSettings = function() {
+		$('#settingswrapper').fadeOut();
+		$('#settings').slideUp();
+		return false;
+	}
+	var openSettings = function() {
+		$('#settingswrapper').fadeIn();
+		$('#settings').slideDown();
+		return false;
+	}
 
 	// attach actions to buttons
 	$('#thumbscreenbutton').on('click',function(){History.pushState(null,"thumbscreen","?v=thum")});
@@ -155,6 +177,12 @@ var layoutModule = function ($, EV) {
 	$('#bcalendar').on('click',function(){History.pushState(null,"calendar","?v=cale")});
 	$('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat")});
 	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
+	// settings form elements
+	$('#color').on('change', function(){setCSS();});
+	$('#font').on('change', function(){setCSS();});
+	$('#fontsize').on('change', function(){setCSS();});
+	$('#settings-close').on('click',function(){return closeSettings();});
+	$('#settings-open').on('click',function(){return openSettings();});
 
 	// attach state handlers for history
   History.Adapter.bind(window, 'statechange', displayFromQuery);

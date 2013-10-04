@@ -11,7 +11,11 @@
 	<!-- -->
 	<script type="text/javascript" src="js/all.min.js"></script>
 	<!-- -->
+	<!-- note that these four css files MUST be the first ones -->
 	<link rel="stylesheet" href="css/main.css" />
+	<link rel="stylesheet" href="css/src/color2.css" />
+	<link rel="stylesheet" href="css/src/font1.css" />
+	<link rel="stylesheet" href="css/src/fontsize2.css" />
 </head>
 <body>
 <div id="topbar">
@@ -19,7 +23,7 @@
 		<tr>
 			<td width="53"><img id="thumbscreenbutton" src="images/menu-black.png" width="53" height="79" border="0" /></td>
 			<td style="color:white" align="center"><img id="spinner" src="images/black.gif" width="16" height="16" align="absmiddle" /> la.indymedia.org</td>
-			<td align="right" width="53"> &nbsp; &nbsp; </td>
+			<td align="right" width="53"><img id="settings-open" src="images/gear.png" width="32" height="32" /></td>
 		</tr>
 	</table>
 </div>
@@ -45,6 +49,35 @@
         <li id="bcalendar" class="thumb gray"><span class="label">CALENDAR</span></li>
         <li id="bpublish" class="round thumb orange"><span class="label">PUBLISH</span></li>
     </ul>
+</div>
+<div id="settingswrapper">
+</div>
+<div id="settings">
+	<form>
+		<select class="setting" name="color" id="color">
+			<option value=1>black on white</option>
+			<option value=2 selected>white on black</option>
+		</select>
+		<hr>
+		<select class="setting" name="font" id="font">
+			<option value=1 selected>sans-serif</option>
+			<option value=2>serif</option>
+			<option value=3>Georgia</option>
+			<option value=4>Helvetica</option>
+			<option value=5>Helvetica Neue</option>
+			<option value=6>Palatino</option>
+			<option value=7>Optima</option>
+			<option value=8>Android</option>
+		</select>
+		<hr>
+		<select class="setting" name="fontsize" id="fontsize">
+			<option value=1>small font (10pt)</option>
+			<option value=2 selected>medium font (12pt)</option>
+			<option value=3>large font (16pt)</option>
+		</select>
+		<hr>
+		<button type="button" id="settings-close">close</button>
+	</form>
 </div>
 <div id="bottombar" class="region"></div>
 <!-- //

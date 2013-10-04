@@ -1,0 +1,17 @@
+body {
+	background-color: white;
+	color: black;
+}
+h2 {
+	color: black;
+}
+#topbar { color: white; background-color: black; }
+#local, #feature { background-color: white; color: black; }
+ul.articlelist li a { color: black; }
+ul.articlelist li a:visited { color: #444; }
+#bottombar { background-color: black; }
+#heading { color: black; }
+#thumbscreen ul { background-color: white; color: white; }
+#thumbscreen { background-color: white; }
+.eventdate { color: #444; }
+
