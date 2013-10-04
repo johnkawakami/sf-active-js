@@ -160,6 +160,7 @@ ul.articlelist li a:visited {
 	bottom: 0;
 	overflow: hidden;
 	z-index: 1;
+	display: none;
 }
 #settings {
 	z-index:2;
@@ -176,6 +177,7 @@ ul.articlelist li a:visited {
 	padding: 1%;
 	padding-top: 3%;
 	text-align: center;
+	display: none;
 }
 .setting {
 	width: 80%;

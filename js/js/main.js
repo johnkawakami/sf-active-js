@@ -155,9 +155,49 @@ var layoutModule = function ($, EV) {
 		fontsize = $('#fontsize').val();
 		console.log( " " + color + font + fontsize );
 		var links = document.getElementsByTagName('link');
-		links[1].href='css/src/color'+color+'.css'
-		links[2].href='css/src/font'+font+'.css'
-		links[3].href='css/src/fontsize'+fontsize+'.css'
+		links[1].href='css/src/color'+color+'.css';
+		links[2].href='css/src/font'+font+'.css';
+		links[3].href='css/src/fontsize'+fontsize+'.css';
+		if (localStorage) {
+			localStorage['imc-js.color'] = color;
+			localStorage['imc-js.font'] = font;
+			localStorage['imc-js.fontsize'] = fontsize;
+		} else {
+			var exdate = new Date();
+			exdate.setDate(exdate.getDate() + 3600);
+			document.cookie = 'format='+escape([color,font,fontsize].join(','))+"; expires="+exdate.toUTCString();
+		}
+	}
+	// recover stylesheet values from localStorage or a cookie
+	var recoverCSS = function() {
+		var color, font, fontsize;
+		if (localStorage) {
+			color = localStorage['imc-js.color'];
+			font = localStorage['imc-js.font'];
+			fontsize = localStorage['imc-js.fontsize'];
+		} else {
+			var val = document.cookie;
+			var cookies = val.split("; ");
+			for(i=0;i<cookies.length;i++) {
+				if ( cookies[i].indexOf("format") == 0 ) {
+					var values = (cookies[i]).substr(7).split(',');
+					color = values[0];
+					font = values[1];
+					fontsize = values[2];
+				}
+			}
+		}
+		var links = document.getElementsByTagName('link');
+		if (color>0) {
+			links[1].href='css/src/color'+color+'.css';
+		}
+		if (font>0) {
+			links[2].href='css/src/font'+font+'.css';
+		}
+		if (fontsize>0) {
+			links[3].href='css/src/fontsize'+fontsize+'.css';
+		}
+		return [color,font,fontsize];
 	}
 	var closeSettings = function() {
 		$('#settingswrapper').fadeOut();
@@ -165,6 +205,9 @@ var layoutModule = function ($, EV) {
 		return false;
 	}
 	var openSettings = function() {
+		$('#color').val(color);
+		$('#font').val(font);
+		$('#fontsize').val(fontsize);
 		$('#settingswrapper').fadeIn();
 		$('#settings').slideDown();
 		return false;
@@ -202,8 +245,6 @@ var layoutModule = function ($, EV) {
 		height: 128
 	});
     
-
-	
 	// load up headlines from the server
 	$.getJSON(
 		'http://la.indymedia.org/js/ws/regen.php?callback=?',
@@ -232,6 +273,7 @@ var layoutModule = function ($, EV) {
 		} 
 	);
 
+ [color,font,fontsize] = recoverCSS();
 	$('#publish').append('publish');
 
 }; // end of the layout module
