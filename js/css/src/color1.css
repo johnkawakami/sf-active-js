@@ -9,7 +9,7 @@ h2 {
 #local, #feature { background-color: white; color: black; }
 ul.articlelist li a { color: black; }
 ul.articlelist li a:visited { color: #444; }
-#bottombar { background-color: black; }
+#bottombar { background-color: black; color: white; }
 #heading { color: black; }
 #thumbscreen ul { background-color: white; color: white; }
 #thumbscreen { background-color: white; }

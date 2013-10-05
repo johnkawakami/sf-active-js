@@ -17,4 +17,13 @@ mobile phone internet link.
 
 get lists of fonts so i can start on a settings screen.
 
+event json is based on ics format, icalendar.
+uid: id@sitedomain
+organizers: [{ name: ..., mail:... }]
+dtstart: use standard format
+dtend: use standard format
+summary:
+description:
+locations: [{ name:, street:, city:, zip: }]
+tzid: // ISO timezone id
 

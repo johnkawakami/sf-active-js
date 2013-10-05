@@ -8,6 +8,7 @@ var layoutModule = function ($, EV) {
 	var breakingnewsCache = null;
 	var featureCache = null;
 	var localCache = null;
+  var color,font,fontsize; 
 
 	// display switcher
 	// fixme - need a global view switcher that will hide all, then reveal one
@@ -85,15 +86,15 @@ var layoutModule = function ($, EV) {
 		}
 	};
 
-    // utitiles to fill in the layout
-    var clearContent = function() {
-    	$('#heading').html('');
-    	$('#summary').html('');
-    	$('#author').html('');
-    	$('#article').html('');
-    	$('#attachments').html('');
-    	$('#comments').html('');
-    };
+	// utitiles to fill in the layout
+	var clearContent = function() {
+		$('#heading').html('');
+		$('#summary').html('');
+		$('#author').html('');
+		$('#article').html('');
+		$('#attachments').html('');
+		$('#comments').html('');
+	};
 	var insertStory = function(d) {
 		$('#heading').html(d.heading);
 		$('#summary').html(d.summary);
@@ -103,6 +104,8 @@ var layoutModule = function ($, EV) {
 		if (d.media!="") article.append('<p class="media">'+d.media+'</p>');
 		article.append(d.article);
 		article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>');
+		article.append('<div class="reply-button"><a href="">reply</a></div>');
+		article.append('<div class="report-button">+17<button>+</button>&nbsp; -2<button>-</button></div>');
 	};
 	var insertAttachments = function(d) {
 		var att = $('#attachments');
@@ -143,6 +146,8 @@ var layoutModule = function ($, EV) {
 	  }
 	};
 
+	// -----------SETTINGS--------------------------
+	//
 	// Swaps in different css files.  
 	// For now, loads in the theme parts individually, but eventually, we will be constructing the
 	// url from the cookie values of these different settings.  So they'll have names like 
@@ -170,7 +175,6 @@ var layoutModule = function ($, EV) {
 	}
 	// recover stylesheet values from localStorage or a cookie
 	var recoverCSS = function() {
-		var color, font, fontsize;
 		if (localStorage) {
 			color = localStorage['imc-js.color'];
 			font = localStorage['imc-js.font'];
@@ -190,14 +194,16 @@ var layoutModule = function ($, EV) {
 		var links = document.getElementsByTagName('link');
 		if (color>0) {
 			links[1].href='css/src/color'+color+'.css';
+			$('#color').val(color);
 		}
 		if (font>0) {
 			links[2].href='css/src/font'+font+'.css';
+			$('#font').val(font);
 		}
 		if (fontsize>0) {
 			links[3].href='css/src/fontsize'+fontsize+'.css';
+			$('#fontsize').val(fontsize);
 		}
-		return [color,font,fontsize];
 	}
 	var closeSettings = function() {
 		$('#settingswrapper').fadeOut();
@@ -213,6 +219,8 @@ var layoutModule = function ($, EV) {
 		return false;
 	}
 
+	//-----INITIALIZE----------------
+	//
 	// attach actions to buttons
 	$('#thumbscreenbutton').on('click',function(){History.pushState(null,"thumbscreen","?v=thum")});
 	$('#blocal'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
@@ -244,6 +252,7 @@ var layoutModule = function ($, EV) {
 		width: 128,
 		height: 128
 	});
+	$('#publish').append('publish');
     
 	// load up headlines from the server
 	$.getJSON(
@@ -273,8 +282,8 @@ var layoutModule = function ($, EV) {
 		} 
 	);
 
- [color,font,fontsize] = recoverCSS();
-	$('#publish').append('publish');
+	// reload saved settings for CSS
+	recoverCSS();
 
 }; // end of the layout module
 
@@ -368,39 +377,6 @@ var EmbedAudio = function() {
 	};
 };
 
-/* not sure what pattern this is.  Similar to Revealing Module, but it instantiates a new set of functions
- * with each call.  So it's really like a constructor function.  This style is wasteful if it's used >1 time
- * because all the functions are instantiated anew each time.
- */
-/** draw and respond to the settings icon */
-var SettingsIconFactory = function($,id) {
-	var x, y, direction;
-	var settings = {};
-	var drawWidget = function() {
-		$(id).append('<span class="iconright"><img id="'+id.substr(1)+'-settings" src="images/settings-black.png" align="absmiddle" /></span>');
-		// attach handler to it
-		$(id+"-settings").on("click", drawDialog);
-		// discover the x and y position of the widget
-	};
-	var drawDialog = function() {
-		localStorage['rsstime'] = 0;
-		alert("drawDialog " + id);
-	};
-	var handlers = function() {
-	};
-	var save = function(d) {
-	};
-	var close = function() {
-	};
-	var eraseWidget = function() {
-	};
-	return {
-		settings: settings,
-		drawWidget: drawWidget,
-		eraseWidget: eraseWidget
-	};
-};
-
 // converts a regular url into a url pulled by the local proxy script
 var getProxyUrl = function(url) {
 	if (document.location.href.match('indymedia.lo')) {
@@ -415,8 +391,8 @@ var getProxyUrl = function(url) {
 function main($) {
 	var uri = new URI( document.location.href );
 	var search = uri.search(true);
-	var url = search['url'];
-	var v = search['v'];
+	var url = search['url']; // means we want to view a specific url
+	var v = search['v']; // means view
 	if ( v ) {
 		console.log('v specified, so doing nothing');
 	} else	if (!url || url==='') {
@@ -424,6 +400,10 @@ function main($) {
 		History.replaceState(null, "thumbscreen", "?v=thum");
 	} else {
 		console.log("url set, assuming it's content");
+		// url patterns are: - fixme
+		// /news/year/month/id.json - articles
+		// /events/year/id.json - calendar events
+		// /features/year/id.json - features
 		History.replaceState(null, "content", "/?v=cont&url=" + url);
 	}
 	var cache = search['cache'];

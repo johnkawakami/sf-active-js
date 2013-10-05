@@ -22,7 +22,7 @@
 		<tr>
 			<td width="53"><img id="thumbscreenbutton" src="images/menu-black.png" width="53" height="79" border="0" /></td>
 			<td style="color:white" align="center"><img id="spinner" src="images/black.gif" width="16" height="16" align="absmiddle" /> la.indymedia.org</td>
-			<td align="right" width="53"><img id="settings-open" src="images/gear.png" width="32" height="32" /></td>
+			<td align="right" width="53"><img id="settings-open" src="images/gear.png" width="32" height="32" hspace="15" /></td>
 		</tr>
 	</table>
 </div>
@@ -38,7 +38,6 @@
 	<div id="article"></div>
 	<div id="attachments"></div>
 	<div id="comments"></div>
-    <div id="qrcode"></div>
 </div>
 <div id="thumbscreen" style="display:none">
     <ul style="margin:0; padding: 0;">
@@ -57,7 +56,6 @@
 			<option value=1>black on white</option>
 			<option value=2 selected>white on black</option>
 		</select>
-		<hr>
 		<select class="setting" name="font" id="font">
 			<option value=1 selected>sans-serif</option>
 			<option value=2>serif</option>
@@ -68,17 +66,42 @@
 			<option value=7>Optima</option>
 			<option value=8>Android</option>
 		</select>
-		<hr>
 		<select class="setting" name="fontsize" id="fontsize">
 			<option value=1>small font (10pt)</option>
 			<option value=2 selected>medium font (12pt)</option>
 			<option value=3>large font (16pt)</option>
 		</select>
-		<hr>
 		<button type="button" id="settings-close">close</button>
 	</form>
 </div>
-<div id="bottombar" class="region"></div>
+<div id="share">
+	<ul class="share">
+		<li>Copwatch, LA</li>
+		<li>Facebook</li>
+		<li>Google+</li>
+		<li>Infoshop News</li>
+		<li>Libcom</li>
+		<li>Newsvine</li>
+		<li>Tumblr</li>
+		<li>Twitter</li>
+	</ul>
+</div>
+<div id="editor">
+	<div id="editor-menu"><ul class="tabs"><li>EDIT</li><li>PREVIEW</li></ul></div>
+	<div id="editor-type">
+		<form>
+			<textarea id="editor-textarea">
+			</textarea>
+		</form>
+	</div>
+	<div id="editor-preview">
+	</div>
+</div>
+</div>
+<div id="bottombar" class="region">
+  <div id="qrcode"></div>
+	<button>share</button> 
+</div>
 <!-- // -->
   <script type="text/javascript" src="vendor/history.adapter.jquery.js"></script>
   <script type="text/javascript" src="vendor/history.js"></script>

@@ -95,9 +95,16 @@ ul.articlelist li a:visited {
 	height: 100%;
 }
 #bottombar {
-	height: 20px;
-	background-color: black;
+	font-size: 10pt;
+	height: 140px;
 	clear: both;
+}
+#bottombar button {
+	margin: 0pt 5pt 12pt 5pt;
+	padding: 1px;
+	font-size: 8pt;
+	corner-radius: 0px;
+	border: 1px solid white;
 }
 
 #heading {
@@ -114,10 +121,38 @@ ul.articlelist li a:visited {
 }
 #article {
 	display: block;
+	padding-bottom: 3%:
 }
+#article .reply-button {
+	border: 1px solid blue;
+	padding: 4px;
+	width: 15%;
+	color: white;
+	background-color: #007;
+	text-align: center;
+	float: left;
+	margin-bottom: 20px;
+}
+#article .report-button {
+	border: 1px solid white;
+	padding: 4px;
+	width: 30%;
+	max-width: 150px;
+	min-width: 120px;
+	color: white;
+	background-color: #222;
+	text-align: center;
+	float: right;
+	font-size: 70%;
+}
+
 #qrcode {
 	text-align: center;
-	width: 100%;
+	width: 130px;
+	padding: 5px;
+	background-color: white;
+	float: left;
+	margin: 0px 15px 0px 15px;
 }
 #thumbscreen ul li.thumb span.label {
 	display: table-cell;
@@ -164,23 +199,71 @@ ul.articlelist li a:visited {
 }
 #settings {
 	z-index:2;
-	width: 80%;
+	width: 94%;
+	left: 2%;
+	top: 0;
 	font-size: 10pt;
-	height: 140px;
+	height: 120pt;
 	color: black;
 	background-color: white;
 	position: fixed;
-	top: 5%;
-	left: 5%;
-	border-radius: 20px;
-	border: 4pt solid green;
-	padding: 1%;
-	padding-top: 3%;
+	padding: 10px;
+	padding-top: 30px;
 	text-align: center;
 	display: none;
 }
 .setting {
 	width: 80%;
+	display: block;
+	margin: 10pt auto 10pt auto;
+}
+#share {
+	z-index:2;
+	width: 94%;
+	left: 2%;
+	bottom: 0;
+	font-size: 10pt;
+	height: 300pt;
+	color: black;
+	background-color: white;
+	position: fixed;
+	padding: 10px;
+	padding-bottom: 30px;
+	text-align: center;
+	display: none;
+}
+ul.share {
+	margin: 0;
+	padding-left: 0;
+  list-style-type: none;
+}
+ul.share li {
+	font-size: 12pt;
+	padding: 1em;
+	border: none;
+	border-bottom: 1px solid #666;
+}
+ul.share li a {
+	color: white;
+	text-decoration: none;
+}
+ul.share li a:visited {
+    color: #bbb;
+    text-decoration: none;
+}
+
+#editor {
+}
+#editor-type form textarea {
+	width: 90%;
+	height: 90%;
+}
+/* fixme */
+#editor-menu ul.tabs {
+
+}
+#editor-menu ul.tabs li {
+
 }
 
 .noselect {
