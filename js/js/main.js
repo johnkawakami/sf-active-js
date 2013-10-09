@@ -243,11 +243,11 @@ var layoutModule = function ($, EV) {
 	$('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat")});
 	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
 	// settings form elements
-	//$('#color').on('change', function(){setCSS();});
-	//$('#font').on('change', function(){setCSS();});
-	//$('#fontsize').on('change', function(){setCSS();});
-	//$('#settings-close').on('click',function(){return closeSettings();});
-	//$('#settings-open').on('click',function(){return openSettings();});
+	$('#color').on('change', function(){setCSS();});
+	$('#font').on('change', function(){setCSS();});
+	$('#fontsize').on('change', function(){setCSS();});
+	$('#settings-close').on('click',function(){return closeSettings();});
+	$('#settings-open').on('click',function(){return openSettings();});
 
 	// attach state handlers for history
   History.Adapter.bind(window, 'statechange', displayFromQuery);
@@ -270,10 +270,8 @@ var layoutModule = function ($, EV) {
 	*/
 	$('#publish').append('publish');
 
-	console.log('hijohn');
-    
 	// load up headlines from the server
-	var articleLoader =	function(j) {
+	var haedlineLoader =	function(j) {
 			console.log('loaded the headlines');
 			local = j["local"];
 			feature = j["features"];
@@ -305,7 +303,7 @@ var layoutModule = function ($, EV) {
 	$.getJSON(
 		'http://la.indymedia.org/js/ws/regen.php?callback=?',
 		{ "s":"combined" },
-		articleLoader,
+		headlineLoader,
 		function (j) {
 			console.log("some kind of error happened");
 		}
@@ -313,14 +311,14 @@ var layoutModule = function ($, EV) {
 	*/
 	$.getJSON(
 		getProxyUrl("http://la.indymedia.org/js/ws/regen.php?s=combined"),
-		articleLoader,
+		headlineLoader,
 		function (j) {
 			console.log("some kind of error happened");
 		}
 	);
 
 	// reload saved settings for CSS
-	//recoverCSS();
+	recoverCSS();
 
 }; // end of the layout module
 
