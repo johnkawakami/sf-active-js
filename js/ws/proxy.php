@@ -15,11 +15,13 @@ if (preg_match( '/\/\d\d\d\d\/\d\d\/\d{1,20}\.json$/', $url ))
 	curl_exec($ch);
 	curl_close($ch);
 }
-if (preg_match( '/newswire\.rss$/', $url))
+else if (preg_match( '/\/js\/ws\/regen\.php\?s=combined$/', $url ))
 {
-	header("Content-Type: application/rss+xml");
+	header("Content-Type: application/json");
 	$ch = curl_init( $url );
 	curl_setopt($ch, CURLOPT_HEADER, 0);
 	curl_exec($ch);
 	curl_close($ch);
+} else {
+  echo "invalid url";
 }

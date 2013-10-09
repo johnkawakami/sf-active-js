@@ -33,7 +33,7 @@ var layoutModule = function ($, EV) {
 	};
 
 	
-  $("body").on({
+  $(document).on({
 		ajaxStart: function() {
 		  spinnerCounter++;
 			$('#spinner').attr('src','images/spinner_black.gif');
@@ -65,6 +65,7 @@ var layoutModule = function ($, EV) {
 						function (d, error) {
 							console.log("called loader");
 							if (error!='success') alert(error);
+							d.article["numcomments"] = d.comments.length;
 							insertStory( d.article );
 							insertAttachments( d.attachments );
 							insertComments( d.comments );
@@ -104,14 +105,21 @@ var layoutModule = function ($, EV) {
 		if (d.media!="") article.append('<p class="media">'+d.media+'</p>');
 		article.append(d.article);
 		article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>');
-		article.append('<div class="reply-button"><a href="">reply</a></div>');
-		article.append('<div class="report-button">+17<button>+</button>&nbsp; -2<button>-</button></div>');
+		article.append('<div class="disc"><span class="disc-btn" id="disclose-'+d.id+'">'+
+			d.numcomments +' comments</span><span class="disc-btn" id="reply-'+
+			d.id+'">reply</span><span class="disc-btn" id="flag-'+
+			d.id+'">flag</span><span class="disc-btn" id="share-'+
+			d.id+'">share</class></div>');
+		// attach handlers for these buttons above
+		$('#disclose-'+d.id).on('click',function(){ discloseButtonHandler(d.id); } );
+		$('#reply-'+d.id).on('click',function(){ replyButtonHandler(d.id); } );
+		$('#flag-'+d.id).on('click',function(){ flagButtonHandler(d.id); } );
+		$('#share-'+d.id).on('click',function(){ shareButtonHandler(d.id); } );
 	};
 	var insertAttachments = function(d) {
 		var att = $('#attachments');
 		var i = 0;
-		var template = '<div id="article-{{i}}"><h2>{{heading}}</h2><p class="byline">by {{{author}}}<br />{{{format_created}}}</p><p>{{{article}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" class="photo" /></a></p></div>';
-		// if (d.length == 0) return; // bail out on empty
+		var template = '<div id="article-{{i}}" class="article"><h2>{{heading}}</h2><p class="byline">by {{{author}}}<br />{{{format_created}}}</p><p>{{{article}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" class="photo" /></a></p>';
 		att.html(''); // clear them
 		d.forEach( 
 				function (a) {
@@ -129,7 +137,7 @@ var layoutModule = function ($, EV) {
 		);
 	};
 	var insertComments = function(d) {
-	  var commentTemplate = '<div id="article-{{i}}"><h2>{{heading}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
+	  var commentTemplate = '<div id="article-{{i}}" class="comment"><h2>{{{heading}}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
 	  var comm = $('#comments');
 	  comm.html(''); // clear it out
 	  for(var i=0;i<d.length;i++) {
@@ -145,6 +153,12 @@ var layoutModule = function ($, EV) {
 			comm.append( text );
 	  }
 	};
+
+	// handlers for buttons under articles and comments
+	var discloseButtonHandler = function(id) { console.log(id); }
+	var replyButtonHandler = function(id) { console.log(id); }
+	var flagButtonHandler = function(id) { console.log(id); }
+	var shareButtonHandler = function(id) { console.log(id); }
 
 	// -----------SETTINGS--------------------------
 	//
@@ -229,11 +243,11 @@ var layoutModule = function ($, EV) {
 	$('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat")});
 	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
 	// settings form elements
-	$('#color').on('change', function(){setCSS();});
-	$('#font').on('change', function(){setCSS();});
-	$('#fontsize').on('change', function(){setCSS();});
-	$('#settings-close').on('click',function(){return closeSettings();});
-	$('#settings-open').on('click',function(){return openSettings();});
+	//$('#color').on('change', function(){setCSS();});
+	//$('#font').on('change', function(){setCSS();});
+	//$('#fontsize').on('change', function(){setCSS();});
+	//$('#settings-close').on('click',function(){return closeSettings();});
+	//$('#settings-open').on('click',function(){return openSettings();});
 
 	// attach state handlers for history
   History.Adapter.bind(window, 'statechange', displayFromQuery);
@@ -247,18 +261,20 @@ var layoutModule = function ($, EV) {
 	*/
 
 	// load up the bottom area
+	/*
 	new QRCode( document.getElementById('qrcode'), {
 		text: window.location.href,
 		width: 128,
 		height: 128
 	});
+	*/
 	$('#publish').append('publish');
+
+	console.log('hijohn');
     
 	// load up headlines from the server
-	$.getJSON(
-		'http://la.indymedia.org/js/ws/regen.php?callback=?',
-		{ "s":"combined" },
-		function(j) {
+	var articleLoader =	function(j) {
+			console.log('loaded the headlines');
 			local = j["local"];
 			feature = j["features"];
 			calendar = j["calendar"];
@@ -279,11 +295,32 @@ var layoutModule = function ($, EV) {
 			featureCache = formatArticleList( feature );
 			$('#feature').append( featureCache );
 			attachArticleListClickHandler( feature );
-		} 
+		};
+	/* 
+		Android 2.1 browser won't do callbacks, so you need to use
+		the local proxy service.  Need to detect this exception and
+		switch out the URL appropriately.
+	*/
+	/* 
+	$.getJSON(
+		'http://la.indymedia.org/js/ws/regen.php?callback=?',
+		{ "s":"combined" },
+		articleLoader,
+		function (j) {
+			console.log("some kind of error happened");
+		}
+	);
+	*/
+	$.getJSON(
+		getProxyUrl("http://la.indymedia.org/js/ws/regen.php?s=combined"),
+		articleLoader,
+		function (j) {
+			console.log("some kind of error happened");
+		}
 	);
 
 	// reload saved settings for CSS
-	recoverCSS();
+	//recoverCSS();
 
 }; // end of the layout module
 
@@ -379,7 +416,8 @@ var EmbedAudio = function() {
 
 // converts a regular url into a url pulled by the local proxy script
 var getProxyUrl = function(url) {
-	if (document.location.href.match('indymedia.lo')) {
+	if (document.location.href.match('indymedia.lo')||
+		  document.location.href.match('192.168.111.4')) {
 		return "/js/ws/proxy.php?url=" +  escape(url);
 	} else {
 		return url;
