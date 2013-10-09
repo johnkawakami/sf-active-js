@@ -271,7 +271,7 @@ var layoutModule = function ($, EV) {
 	$('#publish').append('publish');
 
 	// load up headlines from the server
-	var haedlineLoader =	function(j) {
+	var headlineLoader =	function(j) {
 			console.log('loaded the headlines');
 			local = j["local"];
 			feature = j["features"];
