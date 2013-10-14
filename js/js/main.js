@@ -13,21 +13,23 @@ var layoutModule = function ($, EV) {
 	// display switcher
 	// fixme - need a global view switcher that will hide all, then reveal one
 	var views = { 
-			'thum':'#thumbscreen',
-			'loca':'#local',
-			'brea':'#breakingnews',
-			'feat':'#feature',
-			'publ':'#publish',
-			'cale':'#calendar',
-			'cont':'#content'
+			'thum':['#thumbscreen', 'LA Indymedia'],
+			'loca':['#local', 'Local News'],
+			'brea':['#breakingnews', 'Breaking News'],
+			'feat':['#feature', 'Featured Stories'],
+			'publ':['#publish', 'Publish'],
+			'cale':['#calendar', 'Calendar'],
+			'cont':['#content', 'LA Indymedia']
 			};
 	var displaySwitcher = function(view) {
 		if (view==null || view=="") view='thum';
 		for (var v in views) {
 			if (v == view) {
-				$(views[v]).css('display', 'block');
+				$(views[v][0]).css('display', 'block');
+				$(document).attr('title', views[v][1]);
+				$('#header-title').html(views[v][1]);
 			} else {
-				$(views[v]).css('display', 'none');
+				$(views[v][0]).css('display', 'none');
 			}
 		}
 	};

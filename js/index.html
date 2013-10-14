@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html><!-- all javascript IMC pages -->
 <head>
+	<!-- note that these four css files MUST be the first links -->
+	<link rel="stylesheet" href="css/main.css" />
+	<link rel="stylesheet" href="css/src/color2.css" />
+	<link rel="stylesheet" href="css/src/font1.css" />
+	<link rel="stylesheet" href="css/src/fontsize2.css" />
+	<link rel="apple-touch-icon" href="images/ios-icon.png" />
   <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0, maximum-scale=1.0" />
 	<!-- // --> 
 	<script type="text/javascript" src="vendor/jquery-1.9.1.min.js"></script>
@@ -10,18 +16,14 @@
 	<!-- 
 	<script type="text/javascript" src="js/all.min.js"></script>
 	-->
-	<!-- note that these four css files MUST be the first ones -->
-	<link rel="stylesheet" href="css/main.css" />
-	<link rel="stylesheet" href="css/src/color2.css" />
-	<link rel="stylesheet" href="css/src/font1.css" />
-	<link rel="stylesheet" href="css/src/fontsize2.css" />
 </head>
 <body>
 <div id="topbar">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 		<tr>
 			<td width="53"><img id="thumbscreenbutton" src="images/menu-black.png" width="53" height="79" border="0" /></td>
-			<td style="color:white" align="center"><img id="spinner" src="images/black.gif" width="16" height="16" align="absmiddle" /> la.indymedia.org</td>
+			<td style="color:white" align="center"><img id="spinner" src="images/black.gif" width="16" height="16" align="absmiddle" />
+			<span id="header-title">la.indymedia.org</span></td>
 			<td align="right" width="53"><img id="settings-open" src="images/gear.png" width="32" height="32" hspace="15" /></td>
 		</tr>
 	</table>
