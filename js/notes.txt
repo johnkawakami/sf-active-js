@@ -24,3 +24,23 @@ tzid: // ISO timezone id
 the css and settings features don't work on android 2.1. the entire
 feature should be disabled for 2.1.  it seems to cause failures unrelated
 to the styling.
+
+dialogs should take up the screen - forget borders.  just a white panel with settings.
+
+the reply box should be a massive box with editable text.
+
+A new layout for articles, which looks more like medium.com should be done.  The author should pick a hero image, photo byline, and other features.  This can
+be done by making a table for augmenting the webcast table.  Webcast needs
+some field that will indicate that this otehr table should be consulted for a
+decorator spec.  If a spec exists, an alternative page generator should be
+used to generate the page.
+
+This decorator has:
+  - hero image
+	- text styling features
+	- social media descrptions
+	- list of posts to combine into a photo gallery
+	- hide email?
+	- video player renderer
+	- video url -> player renderer
+

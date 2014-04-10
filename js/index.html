@@ -16,12 +16,18 @@
 	<!-- 
 	<script type="text/javascript" src="js/all.min.js"></script>
 	-->
+	<script>
+		$(document).ready( function () {
+			window.setInterval( IMC.activate, 500 );
+			$('#arrow').on( 'click', IMC.scrollUp );
+		});
+	</script>
 </head>
 <body>
 <div id="topbar">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 		<tr>
-			<td width="53"><img id="thumbscreenbutton" src="images/menu-black.png" width="53" height="79" border="0" /></td>
+			<td width="53"><span id="thumbscreenbutton" style="font-size: 40px; height: 50px;">&nbsp;&lt; </span></td>
 			<td style="color:white" align="center"><img id="spinner" src="images/black.gif" width="16" height="16" align="absmiddle" />
 			<span id="header-title">la.indymedia.org</span></td>
 			<td align="right" width="53"><img id="settings-open" src="images/gear.png" width="32" height="32" hspace="15" /></td>
@@ -82,6 +88,7 @@
 		<li>Twitter</li>
 	</ul>
 </div>
+<div id="arrow"><img src="images/scrolltop.png" /></div>
 <div id="bottombar" class="region">
   <div id="qrcode"></div>
 	<button>share</button> 

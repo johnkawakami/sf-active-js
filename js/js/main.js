@@ -2,6 +2,32 @@
 // our namespace
 var IMC = {};
 
+IMC.activate = function () {
+	var arrow = $('#arrow');
+	if ( $(document).scrollTop() > 200 ) {
+		if ( arrow.css("display")=="none" ) {
+			arrow.fadeTo( "slow", 0.7 );
+		}
+	} else {
+		if ( arrow.css("display")!="none" ) {
+			arrow.fadeOut("slow");
+		}
+	}
+};
+IMC.scrollUp = function () {
+	var d = $(document);
+	var start = d.scrollTop();
+	var end = 0;
+  var divs = 20;
+	var divsquared = divs * divs;
+	var delta = ( start - end);
+	var i;
+	for( i = 0; i < divs; i++ ) {
+		pos = i * i * delta / (divsquared) ;
+		window.setTimeout( new Function("{$(document).scrollTop("+(pos)+")}"), (divs-i)*20 );
+	}
+};
+
 var layoutModule = function ($, EV) {
 	// module globals
 	var spinnerCounter = 0;
@@ -87,6 +113,13 @@ var layoutModule = function ($, EV) {
 				displaySwitcher(values.v);
 			break;
 		}
+		/*
+		switch(values["_d"]) {
+			case 's':
+				// show the settings
+				break;
+		}
+		*/
 	};
 
 	// utitiles to fill in the layout
@@ -250,6 +283,8 @@ var layoutModule = function ($, EV) {
 	$('#fontsize').on('change', function(){setCSS();});
 	$('#settings-close').on('click',function(){return closeSettings();});
 	$('#settings-open').on('click',function(){return openSettings();});
+	//$('#settings-open').on('click',function(){History.pushState(null,"settings",url.append("_d=s"))});
+	//$('#settings-close').on('click',function(){History.popState()});
 
 	// attach state handlers for history
   History.Adapter.bind(window, 'statechange', displayFromQuery);
@@ -414,6 +449,27 @@ var EmbedAudio = function() {
 	};
 };
 
+/* 
+	 This proxy url format is terrible. 
+   It breaks using the back button to escape from dialog boxes.  A big
+	 android issue.  The fix is that proxy url format needs to be more 
+	 like this: /js/?id=12345&m=01&y=2013, or omit the m and y and just
+	 generate the full url internally.  We can look for the real url in 
+	 the json file.
+
+	 Then, when we want to show settings, we change state and append _d=s
+	 to the url: /js/?id=12345&_d=s
+
+	 _d means "dialog box" and the value selects the box.
+
+	 That way history.js can manage it.  
+
+	 On our side, it complicates things - we have the 
+	 DisplaySwitcher and DisplayFromQuery.  The DS manipulates
+	 the DOM to show the right thing, and DFQ loads the data into
+	 the layout.  We'd need to create ManageDialog that will 
+	 display or hide dialog boxes.
+*/
 // converts a regular url into a url pulled by the local proxy script
 var getProxyUrl = function(url) {
 	if (document.location.href.match('indymedia.lo')||
