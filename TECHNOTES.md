@@ -42,7 +42,7 @@ Comments are included in toto within the story, for rendering.
 
 Presently, comments can have one attachment.  Perhaps that will be allowed.  Maybe attachments and comments are extensions of a generic story.
 
-Calendar events are going to be shoehorned into stories.  It'll be forced.
+Calendar events were going to be done as stories.  I don't think that'll work so well.  The raw format is going to resemble ics format.  We'll start by making ics files, then vcal files, then a json collection of the descriptions and times.
 
 Features are going to become stories too.  Right now, they are their own thing, with some revision history features.  I don't think the revisions feature has been that useful.
 
