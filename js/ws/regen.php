@@ -343,7 +343,7 @@ function select_features( $category_id ) {
 			$b['date'] = substr($a['date'],6,4).'/'.
 			             substr($a['date'],0,2).'/'.
 			             substr($a['date'],3,2);
-			$b['url'] = '/features/'+$b['date']+'/'+$b['id']+'.json';
+			$b['url'] = '/archives/cache/json/'.$b['id'].'.json';
 			return $b;
 		},
 		$features );
