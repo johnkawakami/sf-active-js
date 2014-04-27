@@ -14,4 +14,5 @@ ul.articlelist li a:visited { color: #444; }
 #thumbscreen ul { background-color: white; color: white; }
 #thumbscreen { background-color: white; }
 .eventdate { color: #444; }
+#arrow { background-color: black; border-radius: 15px; opacity: 0.5; }
 
