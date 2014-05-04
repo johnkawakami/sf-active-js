@@ -236,24 +236,33 @@ ul.articlelist li a:visited {
 }
 #settings {
 	z-index:2;
-	width: 94%;
-	left: 2%;
-	top: 0;
+	width: 290px;
+	height: 300px;
+	right: 0px;
+	top: 50px;
 	font-size: 10pt;
-	height: 160pt;
 	color: black;
-	background-color: white;
+	background-color: rgba(128,128,128,0.3);
 	position: fixed;
 	padding: 10px;
-	padding-top: 30px;
 	text-align: center;
 	display: none;
 }
-.setting {
-	width: 80%;
-	display: block;
-	margin: 15px auto 15px auto;
-	height: 30px;
+#settings td {
+ 	width: 80px;
+	height: 80px;
+	font-size: 30px;
+	background-color: #fff;
+}
+#settings td.lit {
+	border: 2px solid #A00;
+	box-shadow: 0 0 6px rgba(255,128,0,1);
+}
+#settings td.none {
+	background-color: transparent;
+}
+#settings table {
+	border-spacing: 10px;
 }
 
 /* share dialog */

@@ -34,7 +34,9 @@ var layoutModule = function ($, EV) {
 	var breakingnewsCache = null;
 	var featureCache = null;
 	var localCache = null;
-  var color,font,fontsize; 
+	var fontsize=1; 
+  var color=1;
+	var font=1;
 
 	// display switcher
 	// fixme - need a global view switcher that will hide all, then reveal one
@@ -132,14 +134,21 @@ var layoutModule = function ($, EV) {
 		$('#comments').html('');
 	};
 	var insertStory = function(d) {
-		$('#heading').html(d.heading);
-		$('#summary').html(d.summary);
-		$('#author').html('by '+d.author);
+		if (d.heading) { $('#heading').html(d.heading); }
+		if (d.summary) { $('#summary').html(d.summary); }
+		if (d.author) { $('#author').html('by '+d.author); }
 		var article = $('#article');
 		article.html('');
-		if (d.media!="") article.append('<p class="media">'+d.media+'</p>');
+		if (d.media && d.media!="") {
+			imgurl = /<img.+src="(.+?)".+?>/.exec(d.media)[1];
+			article.append('<p class="media"><img class="photo" src="'+
+			  imgurl+'"></p>');
+		} else {
+			imgre = /image/;
+			if (imgre.test(d.mime_type)) { article.append('<p class="media"><img style="min-width: 40%; max-width:100%" src="'+d.linked_file+'"></p>'); }
+		}
 		article.append(d.article);
-		article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>');
+		if (d.link) { article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>'); }
 		article.append('<div class="disc"><span class="disc-btn" id="disclose-'+d.id+'">'+
 			d.numcomments +' comments</span><span class="disc-btn" id="reply-'+
 			d.id+'">reply</span><span class="disc-btn" id="flag-'+
@@ -172,7 +181,7 @@ var layoutModule = function ($, EV) {
 		);
 	};
 	var insertComments = function(d) {
-	  var commentTemplate = '<div id="article-{{i}}" class="comment"><h2>{{{heading}}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
+	  var commentTemplate = '<div id="article-{{i}}" class="comment"><h2>{{{heading}}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{image}}}{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
 	  var comm = $('#comments');
 	  comm.html(''); // clear it out
 	  for(var i=0;i<d.length;i++) {
@@ -181,6 +190,9 @@ var layoutModule = function ($, EV) {
 			data.article = Encoder.htmlDecode(data.article);
 			if (data.mime_type=='text/plain') {
 				data.article = data.article.replace( /\n/mg, '<br />' );
+			}
+			if (/image/.test(data.mime_type)) {
+				data.image = "<img src='"+data.linked_file+"' class='photo'>"
 			}
 			data.author = Encoder.htmlDecode(data.author);
 			var text = Mustache.render(commentTemplate, data );
@@ -203,11 +215,6 @@ var layoutModule = function ($, EV) {
 	// theme-1-5-2.css.  There are potentialy dozens or hundreds of css files, each very short, like < 1k.
 	// I should be using an ID attribute on the link tags. -fixme
 	var setCSS = function() {
-		var color, font, size;
-		color = $('#color').val();
-		font = $('#font').val();
-		fontsize = $('#fontsize').val();
-		console.log( " " + color + font + fontsize );
 		var links = document.getElementsByTagName('link');
 		links[1].href='css/src/color'+color+'.css';
 		links[2].href='css/src/font'+font+'.css';
@@ -223,11 +230,15 @@ var layoutModule = function ($, EV) {
 		}
 	}
 	// recover stylesheet values from localStorage or a cookie
+	// call this before using any styles
 	var recoverCSS = function() {
 		if (localStorage) {
 			color = localStorage['imc-js.color'];
+			if (!color) color=2;
 			font = localStorage['imc-js.font'];
+			if (!font) font=1;
 			fontsize = localStorage['imc-js.fontsize'];
+			if (!fontsize) fontsize=2;
 		} else {
 			var val = document.cookie;
 			var cookies = val.split("; ");
@@ -260,12 +271,26 @@ var layoutModule = function ($, EV) {
 		return false;
 	}
 	var openSettings = function() {
-		$('#color').val(color);
-		$('#font').val(font);
-		$('#fontsize').val(fontsize);
 		$('#settingswrapper').fadeIn();
 		$('#settings').slideDown();
+		console.log( "color " + color );
+		console.log( "fontsize " + fontsize );
+		console.log( "font " + font );
+		showSettings();
+		$('#settingswrapper').on('click',closeSettings);
 		return false;
+	}
+	var showSettings = function() {
+	  var sets = ['black','white','small','medium','large','sans','serif'];
+		$.map( sets, function(a,b) { $('#settings-'+a).removeClass('lit'); } );
+
+		if (color==1) { $('#settings-white').addClass('lit'); }	
+		if (color==2) { $('#settings-black').addClass('lit'); }	
+		if (fontsize==1) { $('#settings-small').addClass('lit'); }	
+		if (fontsize==2) { $('#settings-medium').addClass('lit'); }	
+		if (fontsize==3) { $('#settings-large').addClass('lit'); }	
+		if (font==1) { $('#settings-sans').addClass('lit'); }	
+		if (font==2) { $('#settings-serif').addClass('lit'); }	
 	}
 
 	//-----INITIALIZE----------------
@@ -278,11 +303,15 @@ var layoutModule = function ($, EV) {
 	$('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat")});
 	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
 	// settings form elements
-	$('#color').on('change', function(){setCSS();});
-	$('#font').on('change', function(){setCSS();});
-	$('#fontsize').on('change', function(){setCSS();});
 	$('#settings-close').on('click',function(){return closeSettings();});
 	$('#settings-open').on('click',function(){return openSettings();});
+	$('#settings-small').on('click',function(){ fontsize=1; showSettings(); setCSS(); });
+	$('#settings-medium').on('click',function(){ fontsize=2; showSettings(); setCSS(); });
+	$('#settings-large').on('click',function(){ fontsize=3; showSettings(); setCSS(); });
+	$('#settings-white').on('click',function(){ color=1; showSettings(); setCSS(); });
+	$('#settings-black').on('click',function(){ color=2; showSettings(); setCSS(); });
+	$('#settings-serif').on('click',function(){ font=2; showSettings(); setCSS(); });
+	$('#settings-sans').on('click',function(){ font=1; showSettings(); setCSS(); });
 	//$('#settings-open').on('click',function(){History.pushState(null,"settings",url.append("_d=s"))});
 	//$('#settings-close').on('click',function(){History.popState()});
 

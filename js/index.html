@@ -59,22 +59,23 @@
 <div id="settingswrapper">
 </div>
 <div id="settings">
-	<form>
-		<select class="setting" name="color" id="color">
-			<option value=1>black on white</option>
-			<option value=2 selected>white on black</option>
-		</select>
-		<select class="setting" name="font" id="font">
-			<option value=1 selected>sans-serif</option>
-			<option value=2>serif</option>
-		</select>
-		<select class="setting" name="fontsize" id="fontsize">
-			<option value=1>small font (10pt)</option>
-			<option value=2 selected>medium font (12pt)</option>
-			<option value=3>large font (16pt)</option>
-		</select>
-		<button type="button" id="settings-close">close</button>
-	</form>
+	<table border="0">
+		<tr>
+			<td id="settings-small"><small>A</small></td>
+			<td id="settings-medium">A</td>
+			<td id="settings-large"><big>A</big></td>
+		</tr>
+		<tr>
+			<td id="settings-white">xyz</td>
+			<td id="settings-black" style="background-color: black; color: white">xyz</td>
+			<td class="none"></td>
+		</tr>
+		<tr>
+			<td id="settings-serif" style="font-family: Times">serif</td>
+			<td id="settings-sans" style="font-family: Helvetica,Arial">sans</td>
+			<td class="none"></td>
+		</tr>
+	</table>
 </div>
 <div id="share">
 	<ul class="share">
