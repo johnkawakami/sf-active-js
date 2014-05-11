@@ -124,6 +124,40 @@ var layoutModule = function ($, EV) {
 		*/
 	};
 
+	// -------------- HANDLERS ------------------------
+	var discloseButtonHandler = function(id,ev) { console.log(id); }
+	var replyButtonHandler = function(id,ev) { console.log(id); }
+	var flagButtonHandler = function(id,ev) { console.log(id); }
+	var shareButtonHandler = function(id,ev) { console.log(id); }
+	var closeSettings = function() {
+		$('#settingswrapper').fadeOut();
+		$('#settings').slideUp();
+		return false;
+	}
+	var openSettings = function() {
+		$('#settingswrapper').fadeIn();
+		$('#settings').slideDown();
+		console.log( "color " + color );
+		console.log( "fontsize " + fontsize );
+		console.log( "font " + font );
+		showSettings();
+		$('#settingswrapper').on('click',closeSettings);
+		return false;
+	}
+	var showSettings = function() {
+	  var sets = ['black','white','small','medium','large','sans','serif'];
+		$.map( sets, function(a,b) { $('#settings-'+a).removeClass('lit'); } );
+
+		if (color==1) { $('#settings-white').addClass('lit'); }	
+		if (color==2) { $('#settings-black').addClass('lit'); }	
+		if (fontsize==1) { $('#settings-small').addClass('lit'); }	
+		if (fontsize==2) { $('#settings-medium').addClass('lit'); }	
+		if (fontsize==3) { $('#settings-large').addClass('lit'); }	
+		if (font==1) { $('#settings-sans').addClass('lit'); }	
+		if (font==2) { $('#settings-serif').addClass('lit'); }	
+	}
+
+
 	// utitiles to fill in the layout
 	var clearContent = function() {
 		$('#heading').html('');
@@ -145,43 +179,59 @@ var layoutModule = function ($, EV) {
 			  imgurl+'"></p>');
 		} else {
 			imgre = /image/;
-			if (imgre.test(d.mime_type)) { article.append('<p class="media"><img style="min-width: 40%; max-width:100%" src="'+d.linked_file+'"></p>'); }
+			if (imgre.test(d.mime_type)) { 
+				article.append('<p class="media"><img style="min-width: 40%; max-width:100%" src="'+d.linked_file+'"></p>'); 
+			}
 		}
 		article.append(d.article);
 		if (d.link) { article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>'); }
-		article.append('<div class="disc"><span class="disc-btn" id="disclose-'+d.id+'">'+
-			d.numcomments +' comments</span><span class="disc-btn" id="reply-'+
-			d.id+'">reply</span><span class="disc-btn" id="flag-'+
-			d.id+'">flag</span><span class="disc-btn" id="share-'+
-			d.id+'">share</class></div>');
-		// attach handlers for these buttons above
-		$('#disclose-'+d.id).on('click',function(){ discloseButtonHandler(d.id); } );
-		$('#reply-'+d.id).on('click',function(){ replyButtonHandler(d.id); } );
-		$('#flag-'+d.id).on('click',function(){ flagButtonHandler(d.id); } );
-		$('#share-'+d.id).on('click',function(){ shareButtonHandler(d.id); } );
+
+		$('<div/>', { class:'disc' }).append(
+			a = $('<span/>', { class:'disc-btn', text: d.numcomments+' comment' }),
+			b = $('<span/>', { class:'disc-btn', text:'reply' }),
+			c = $('<span/>', { class:'disc-btn', text:'flag' }),
+			e = $('<span/>', { class:'disc-btn', text:'like' }),
+			f = $('<span/>', { class:'disc-btn', text:'share' })
+		).appendTo( $(article) );
+		a.click( function(x){ discloseButtonHandler(d.id,x); } );
+		b.click( function(x){ replyButtonHandler(d.id,x); } );
+		c.click( function(x){ flagButtonHandler(d.id,x); } );
+		e.click( function(x){ flagButtonHandler(d.id,x); } );
+		f.click( function(x){ shareButtonHandler(d.id,x); } );
 	};
+
 	var insertAttachments = function(d) {
 		var att = $('#attachments');
 		var i = 0;
 		var template = '<div id="article-{{i}}" class="article"><h2>{{heading}}</h2><p class="byline">by {{{author}}}<br />{{{format_created}}}</p><p>{{{article}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" class="photo" /></a></p>';
 		att.html(''); // clear them
 		d.forEach( 
-				function (a) {
-					++i;
-					a.i = i;
-					/* If the article contains a byline, it replaces the author field, and
-					   the byline is deleted. */
-					if ( a.article && ( matches = a.article.match( /^by (.*)$/m ) ) ) {
-						a.author = matches[1];
-						a.article = a.article.replace( /^by .*$/m, '' );
-					}
-					var text = Mustache.render( template, a );
-					att.append( text );
+			function (a) {
+				++i;
+				a.i = i;
+				/* If the article contains a byline, it replaces the author field, and
+					 the byline is deleted. */
+				if ( a.article && ( matches = a.article.match( /^by (.*)$/m ) ) ) {
+					a.author = matches[1];
+					a.article = a.article.replace( /^by .*$/m, '' );
 				}
+				var text = Mustache.render( template, a );
+
+				comment = $.parseHTML( text );
+				// create some buttons
+				$('<div/>', { class:'disc' }).append(
+					a = $('<span/>', { class:'disc-btn', text:'flag' }),
+					b = $('<span/>', { class:'disc-btn', text:'like' })
+				).appendTo( $(comment) );
+				a.click( function () { console.log('flag'); } );
+				b.click( function () { console.log('like'); } );
+
+				att.append( comment );
+			}
 		);
 	};
 	var insertComments = function(d) {
-	  var commentTemplate = '<div id="article-{{i}}" class="comment"><h2>{{{heading}}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{image}}}{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
+	  var commentTemplate = '<div id="article-{{i}}" class="comment"><h2>{{{heading}}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{attachment}}}{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
 	  var comm = $('#comments');
 	  comm.html(''); // clear it out
 	  for(var i=0;i<d.length;i++) {
@@ -192,20 +242,26 @@ var layoutModule = function ($, EV) {
 				data.article = data.article.replace( /\n/mg, '<br />' );
 			}
 			if (/image/.test(data.mime_type)) {
-				data.image = "<img src='"+data.linked_file+"' class='photo'>"
+				data.attachment = "<img src='"+data.linked_file+"' class='photo'>"
 			}
 			data.author = Encoder.htmlDecode(data.author);
 			var text = Mustache.render(commentTemplate, data );
 			text = EV.embedYouTube(text);
-			comm.append( text );
+
+			comment = $.parseHTML( text );
+			// create some buttons
+			$('<div/>', { class:'disc' }).append(
+				a = $('<span/>', { class:'disc-btn', text:'reply' }),
+				b = $('<span/>', { class:'disc-btn', text:'flag' }),
+				c = $('<span/>', { class:'disc-btn', text:'like' })
+			).appendTo( $(comment) );
+			a.click( function () { console.log('reply'); } );
+			b.click( function () { console.log('flag'); } );
+			c.click( function () { console.log('like'); } );
+
+			comm.append( comment );
 	  }
 	};
-
-	// handlers for buttons under articles and comments
-	var discloseButtonHandler = function(id) { console.log(id); }
-	var replyButtonHandler = function(id) { console.log(id); }
-	var flagButtonHandler = function(id) { console.log(id); }
-	var shareButtonHandler = function(id) { console.log(id); }
 
 	// -----------SETTINGS--------------------------
 	//
@@ -264,33 +320,6 @@ var layoutModule = function ($, EV) {
 			links[3].href='css/src/fontsize'+fontsize+'.css';
 			$('#fontsize').val(fontsize);
 		}
-	}
-	var closeSettings = function() {
-		$('#settingswrapper').fadeOut();
-		$('#settings').slideUp();
-		return false;
-	}
-	var openSettings = function() {
-		$('#settingswrapper').fadeIn();
-		$('#settings').slideDown();
-		console.log( "color " + color );
-		console.log( "fontsize " + fontsize );
-		console.log( "font " + font );
-		showSettings();
-		$('#settingswrapper').on('click',closeSettings);
-		return false;
-	}
-	var showSettings = function() {
-	  var sets = ['black','white','small','medium','large','sans','serif'];
-		$.map( sets, function(a,b) { $('#settings-'+a).removeClass('lit'); } );
-
-		if (color==1) { $('#settings-white').addClass('lit'); }	
-		if (color==2) { $('#settings-black').addClass('lit'); }	
-		if (fontsize==1) { $('#settings-small').addClass('lit'); }	
-		if (fontsize==2) { $('#settings-medium').addClass('lit'); }	
-		if (fontsize==3) { $('#settings-large').addClass('lit'); }	
-		if (font==1) { $('#settings-sans').addClass('lit'); }	
-		if (font==2) { $('#settings-serif').addClass('lit'); }	
 	}
 
 	//-----INITIALIZE----------------

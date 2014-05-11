@@ -135,7 +135,7 @@ ul.articlelist li a:visited {
 
 /* discussion and feedback buttons */
 
-#article div.disc {
+div.disc {
 	border: 1px solid #888;
 	height: 40px;
 	line-height: 30px; /* moves the baseline lower than it would be, thus centering text */
@@ -146,7 +146,7 @@ ul.articlelist li a:visited {
 	-o-user-select: none;
 	user-select: none;
 }
-#article div.disc span.disc-btn {
+div.disc span.disc-btn {
 	display: inline-block;
 	cursor: pointer;
 	border: 1px solid #888;
@@ -156,7 +156,7 @@ ul.articlelist li a:visited {
 	font-size: 14px;
 	height: 30px; /* total height, 50 = 30 + padding*2 */
 }
-#article div.disc span.disc-btn:nth-child(1) {
+div.disc span.disc-btn:nth-child(1) {
 	border-left: 1px solid #888;
 }
 
@@ -265,51 +265,43 @@ ul.articlelist li a:visited {
 	border-spacing: 10px;
 }
 
-/* share dialog */
+/* flags */
 
-#share {
-	z-index:2;
-	width: 94%;
-	left: 2%;
-	bottom: 0;
-	font-size: 10pt;
-	height: 300pt;
-	color: black;
-	background-color: white;
-	position: fixed;
-	padding: 10px;
-	padding-bottom: 30px;
-	text-align: center;
+.buttons {
 	display: none;
+	text-align: center;
+	z-index: 2;
+	width: 190px;
+	font-size: 9pt;
+	font-family: Helvetica,Arial,sans-serif;
+	padding: 10px;
+	background-color: rgba(128,128,128,0.3);
 }
-ul.share {
-	margin: 0;
-	padding-left: 0;
-  list-style-type: none;
+.buttons table {
+	width: 170px;
+	margin: 10 auto 10 auto;
+	border-spacing: 8px;
 }
-ul.share li {
-	font-size: 12pt;
-	padding: 1em;
-	border: none;
-	border-bottom: 1px solid #666;
-}
-ul.share li a {
-	color: white;
-	text-decoration: none;
-}
-ul.share li a:visited {
-    color: #bbb;
-    text-decoration: none;
+.buttons td {
+	padding: 10px;
+	background-color: #fff;
+	border: 1px solid silver;
 }
 
 /* text editor for publishing */
 
 #editor {
+	width: 100%;
+	padding: 5px;
+	background-color: rgba(64,64,64,0.3);
 }
-#editor-type form textarea {
+#editor textarea {
 	width: 90%;
+	max-width: 400px;
 	height: 90%;
+	min-height: 300px;
 }
+
 /* fixme */
 #editor-menu ul.tabs {
 
