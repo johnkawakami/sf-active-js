@@ -69,6 +69,9 @@ switch($select) {
 	case 'local': 
 		$output = json_encode( select_local() );
 	break;
+	case 'latestcomments': 
+		$output = json_encode( select_comments() );
+	break;
 	case 'combined':  // all the feeds in one
 		$output = json_encode( select_combined() );
 	break;
@@ -91,6 +94,7 @@ function select_combined() {
 	    'local' => select_local(),
 	    'features' => select_features($production_category_id),
 	    'breakingnews' => select_breakingnews(),
+	    'latestcomments' => select_comments(),
 	    'calendar' => select_calendar()
 	);
 
@@ -349,6 +353,55 @@ function select_features( $category_id ) {
 		$features );
 
 	write_cache_file( $cache_file, $features );
+	
+	return $features;
+}
+
+function select_comments() 
+{
+	global $cache_path;
+	$cache_file = $cache_path . '/latestcomments.json';
+	$output = read_cache_file( $cache_file );
+	if ($output != NULL) return $output;
+
+	$sql = 
+	  "SELECT parent_id, comment_id, heading, author, url, comments, postingdate, parentpostingdate
+		 FROM commentlist ORDER BY postingdate DESC";
+	// status values are 'a'rchive 'c'urrent 'h'idden
+		
+	try {
+		$db = get_pdo_connection();
+		$sth = $db->prepare( $sql );
+		$sth->execute();
+		// load it all into an array
+		$comments = $sth->fetchAll( PDO::FETCH_ASSOC );
+	} catch ( PDOException $e ) {
+		die( $e->getMessage() );
+	}
+	
+	// mangle the comments to resemble news stories
+	$comments = array_map( 
+		function($a) {
+			$b = array();
+			$b['id'] = $a['parent_id'];
+			$b['title'] = $a['heading'];
+
+			$date = $a['postingdate'];
+			$y = substr( $date, 0, 4 );
+			$m = substr( $date, 5, 2 );
+			$d = substr( $date, 8, 2 );
+			$b['date'] = "$y/$m/$d";
+
+			$date = $a['parentpostingdate'];
+			$y = substr( $date, 0, 4 );
+			$m = substr( $date, 5, 2 );
+			$d = substr( $date, 8, 2 );
+			$b['url'] = "/news/$y/$m/".$b['id'].'.json';
+			return $b;
+		},
+		$comments );
+
+	write_cache_file( $cache_file, $comments );
 	
 	return $features;
 }

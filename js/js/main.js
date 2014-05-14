@@ -2,7 +2,7 @@
 // our namespace
 var IMC = {};
 
-IMC.activate = function () {
+IMC.arrow = function () {
 	var arrow = $('#arrow');
 	if ( $(document).scrollTop() > 200 ) {
 		if ( arrow.css("display")=="none" ) {
@@ -14,6 +14,21 @@ IMC.activate = function () {
 		}
 	}
 };
+IMC.activateArrow = function () {
+	if (IMC.arrowPoller) {
+		// do nothing
+	} else {
+		IMC.arrowPoller = window.setInterval( IMC.arrow, 500 );
+	}
+	$('#arrow').on( 'click', IMC.scrollUp );
+}
+IMC.deactivateArrow = function () {
+	$('#arrow').fadeOut();
+	if (IMC.arrowPoller) {
+		window.clearInterval( IMC.arrowPoller );
+		delete(IMC.arrowPoller);
+	}
+}
 IMC.scrollUp = function () {
 	var d = $(document);
 	var start = d.scrollTop();
@@ -27,6 +42,7 @@ IMC.scrollUp = function () {
 		window.setTimeout( new Function("{$(document).scrollTop("+(pos)+")}"), (divs-i)*20 );
 	}
 };
+
 
 var layoutModule = function ($, EV) {
 	// module globals
@@ -47,6 +63,7 @@ var layoutModule = function ($, EV) {
 			'feat':['#feature', 'Featured Stories'],
 			'publ':['#publish', 'Publish'],
 			'cale':['#calendar', 'Calendar'],
+			'comm':['#latestcomments', 'Latest Comments'],
 			'cont':['#content', 'LA Indymedia']
 			};
 	var displaySwitcher = function(view) {
@@ -108,6 +125,7 @@ var layoutModule = function ($, EV) {
 			case 'feat':
 			case 'publ':
 			case 'cale':
+			case 'comm':
 				displaySwitcher(values.v);
 				break;
 			case 'thum':
@@ -125,10 +143,65 @@ var layoutModule = function ($, EV) {
 	};
 
 	// -------------- HANDLERS ------------------------
-	var discloseButtonHandler = function(id,ev) { console.log(id); }
-	var replyButtonHandler = function(id,ev) { console.log(id); }
-	var flagButtonHandler = function(id,ev) { console.log(id); }
-	var shareButtonHandler = function(id,ev) { console.log(id); }
+	var openDisclose = function(id,ev) { console.log(id); }
+	var openReply = function(id,ev) { console.log(id); }
+	var openFlag = function(id,ev) { 
+		var f = $('#flag');
+		var ajaxSubmitFlag = function (id, reason) {
+			return function() {
+				$.getJSON( 'http://la.indymedia.org/qc/report.php?id='+id+'&q='+reason+'&format=json&callback=?',
+					function( data ) {			
+						if (data.moderatorScore) {
+							alert( "Thank you.  Your mod score is " + data.moderatorScore );
+						} else {
+							alert( "Thank you for moderating." );
+						}
+						closeFlag();
+					}
+				)
+				.fail(function(){ 
+					alert("There was an error in moderation.  It has been logged.");
+					closeFlag();
+				});
+			};
+		};
+		$('#settingswrapper').fadeIn().on('click',closeShare);
+		$('#flag-fraud').click( ajaxSubmitFlag( id, 'fraud' ) );
+		$('#flag-racist').click( ajaxSubmitFlag( id, 'racist' ) );
+		$('#flag-genocide').click( ajaxSubmitFlag( id, 'genocide' ) );
+		$('#flag-chatter').click( ajaxSubmitFlag( id, 'chatter' ) );
+		$('#flag-double').click( ajaxSubmitFlag( id, 'double' ) );
+		$('#flag-ad').click( ajaxSubmitFlag( id, 'ad' ) );
+		$('#flag-porn').click( ajaxSubmitFlag( id, 'porn' ) );
+		closeSettings();
+		IMC.deactivateArrow();
+		$('#settingswrapper').fadeIn().on('click',closeFlag);
+		f.css('position','fixed').css('bottom','0').css('left','0');
+		f.slideDown();
+		return false;
+	}
+	var closeFlag = function() {
+		IMC.activateArrow();
+		$('#flag').fadeOut();
+		$('#settingswrapper').fadeOut();
+		$('#flag').slideUp();
+		return false;
+	}
+	var openShare = function(id,ev) { 
+		var s = $('#share');
+		closeSettings();
+		IMC.deactivateArrow();
+		s.css('position','fixed').css('bottom','0').css('left','0');
+		s.slideDown();
+		return false;
+	}
+	var closeShare = function() {
+		IMC.activateArrow();
+		$('#share').fadeOut();
+		$('#settingswrapper').fadeOut();
+		$('#share').slideUp();
+		return false;
+	}
 	var closeSettings = function() {
 		$('#settingswrapper').fadeOut();
 		$('#settings').slideUp();
@@ -193,11 +266,11 @@ var layoutModule = function ($, EV) {
 			e = $('<span/>', { class:'disc-btn', text:'like' }),
 			f = $('<span/>', { class:'disc-btn', text:'share' })
 		).appendTo( $(article) );
-		a.click( function(x){ discloseButtonHandler(d.id,x); } );
-		b.click( function(x){ replyButtonHandler(d.id,x); } );
-		c.click( function(x){ flagButtonHandler(d.id,x); } );
-		e.click( function(x){ flagButtonHandler(d.id,x); } );
-		f.click( function(x){ shareButtonHandler(d.id,x); } );
+		a.click( function(x){ openComments(d.id,x); } );
+		b.click( function(x){ openReply(d.id,x); } );
+		c.click( function(x){ openFlag(d.id,x); } );
+		e.click( function(x){ openLike(d.id,x); } );
+		f.click( function(x){ openShare(d.id,x); } );
 	};
 
 	var insertAttachments = function(d) {
@@ -331,6 +404,7 @@ var layoutModule = function ($, EV) {
 	$('#bcalendar').on('click',function(){History.pushState(null,"calendar","?v=cale")});
 	$('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat")});
 	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
+	$('#blatestcomments' ).on('click',function(){History.pushState(null,"latest comments","?v=comm")});
 	// settings form elements
 	$('#settings-close').on('click',function(){return closeSettings();});
 	$('#settings-open').on('click',function(){return openSettings();});
@@ -372,6 +446,7 @@ var layoutModule = function ($, EV) {
 			feature = j["features"];
 			calendar = j["calendar"];
 			breakingnews = j["breakingnews"];
+			latestcomments = j["latestcomments"];
 
 			localCache = formatArticleList( local );
 			$('#local').append( localCache );
@@ -388,6 +463,10 @@ var layoutModule = function ($, EV) {
 			featureCache = formatArticleList( feature );
 			$('#feature').append( featureCache );
 			attachArticleListClickHandler( feature );
+
+			latestCommentsCache = formatArticleList( latestcomments );
+			$('#latestcomments').append( latestCommentsCache );
+			attachArticleListClickHandler( latestcomments );
 		};
 	/* 
 		Android 2.1 browser won't do callbacks, so you need to use
