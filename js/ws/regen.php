@@ -403,7 +403,7 @@ function select_comments()
 
 	write_cache_file( $cache_file, $comments );
 	
-	return $features;
+	return $comments;
 }
 
 // UTILITIES
