@@ -43,6 +43,12 @@ IMC.scrollUp = function () {
 	}
 };
 
+//------ sharing library
+IMC.share = {};
+IMC.share.facebook = function() { };
+IMC.share.google = function() { };
+IMC.share.twitter = function() { };
+IMC.share.email = function() { };
 
 var layoutModule = function ($, EV) {
 	// module globals
@@ -144,7 +150,8 @@ var layoutModule = function ($, EV) {
 
 	// -------------- HANDLERS ------------------------
 	var openDisclose = function(id,ev) { console.log(id); }
-	var openReply = function(id,ev) { console.log(id); }
+	var openReply = function(id,ev) { 
+	}
 	var openFlag = function(id,ev) { 
 		var f = $('#flag');
 		var ajaxSubmitFlag = function (id, reason) {
@@ -165,7 +172,10 @@ var layoutModule = function ($, EV) {
 				});
 			};
 		};
-		$('#settingswrapper').fadeIn().on('click',closeShare);
+		closeSettings();
+		closeShare();
+		IMC.deactivateArrow();
+		$('#settingswrapper').fadeIn().on('click',closeFlag);
 		$('#flag-fraud').click( ajaxSubmitFlag( id, 'fraud' ) );
 		$('#flag-racist').click( ajaxSubmitFlag( id, 'racist' ) );
 		$('#flag-genocide').click( ajaxSubmitFlag( id, 'genocide' ) );
@@ -173,9 +183,6 @@ var layoutModule = function ($, EV) {
 		$('#flag-double').click( ajaxSubmitFlag( id, 'double' ) );
 		$('#flag-ad').click( ajaxSubmitFlag( id, 'ad' ) );
 		$('#flag-porn').click( ajaxSubmitFlag( id, 'porn' ) );
-		closeSettings();
-		IMC.deactivateArrow();
-		$('#settingswrapper').fadeIn().on('click',closeFlag);
 		f.css('position','fixed').css('bottom','0').css('left','0');
 		f.slideDown();
 		return false;
@@ -189,8 +196,14 @@ var layoutModule = function ($, EV) {
 	}
 	var openShare = function(id,ev) { 
 		var s = $('#share');
+		$('#share-twitter').click( IMC.share.twitter( id ) );
+		$('#share-facebook').click( IMC.share.facebook( id ) );
+		$('#share-google').click( IMC.share.google( id ) );
+		$('#share-email').click( IMC.share.email( id ) );
 		closeSettings();
+		closeFlag();
 		IMC.deactivateArrow();
+		$('#settingswrapper').fadeIn().on('click',closeShare);
 		s.css('position','fixed').css('bottom','0').css('left','0');
 		s.slideDown();
 		return false;
@@ -202,19 +215,18 @@ var layoutModule = function ($, EV) {
 		$('#share').slideUp();
 		return false;
 	}
+	var openSettings = function() {
+		closeShare();
+		closeFlag();
+		IMC.deactivateArrow();
+		$('#settingswrapper').fadeIn().on('click',closeSettings);
+		$('#settings').slideDown();
+		showSettings();
+		return false;
+	}
 	var closeSettings = function() {
 		$('#settingswrapper').fadeOut();
 		$('#settings').slideUp();
-		return false;
-	}
-	var openSettings = function() {
-		$('#settingswrapper').fadeIn();
-		$('#settings').slideDown();
-		console.log( "color " + color );
-		console.log( "fontsize " + fontsize );
-		console.log( "font " + font );
-		showSettings();
-		$('#settingswrapper').on('click',closeSettings);
 		return false;
 	}
 	var showSettings = function() {
@@ -293,11 +305,13 @@ var layoutModule = function ($, EV) {
 				comment = $.parseHTML( text );
 				// create some buttons
 				$('<div/>', { class:'disc' }).append(
-					a = $('<span/>', { class:'disc-btn', text:'flag' }),
-					b = $('<span/>', { class:'disc-btn', text:'like' })
+					a = $('<span/>', { class:'disc-btn', text:'reply' }),
+					b = $('<span/>', { class:'disc-btn', text:'flag' }),
+					c = $('<span/>', { class:'disc-btn', text:'like' })
 				).appendTo( $(comment) );
-				a.click( function () { console.log('flag'); } );
-				b.click( function () { console.log('like'); } );
+				a.click( function (x) { openReply(d.id,x); } );
+				b.click( function (x) { openFlag(d.id,x); } );
+				c.click( function (x) { openLike(d.id,x); } );
 
 				att.append( comment );
 			}
@@ -328,9 +342,9 @@ var layoutModule = function ($, EV) {
 				b = $('<span/>', { class:'disc-btn', text:'flag' }),
 				c = $('<span/>', { class:'disc-btn', text:'like' })
 			).appendTo( $(comment) );
-			a.click( function () { console.log('reply'); } );
-			b.click( function () { console.log('flag'); } );
-			c.click( function () { console.log('like'); } );
+			a.click( function (x) { openReply(d.id,x); } );
+			b.click( function (x) { openFlag(d.id,x); } );
+			c.click( function (x) { openLike(d.id,x); } );
 
 			comm.append( comment );
 	  }

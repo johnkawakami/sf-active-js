@@ -3,29 +3,13 @@ takes requests and fetches the data, handles failures a little bit
 more cleanly - like if something fails, either try again, or notify
 the user of the problem and allow them to refresh.
 
-if a request is failing, and something is clicked, what happens?
-does it launch another request?  i'm kind of lost here.
+Events should be an ICS file, but a subset of the standard, because the standard is too difficult to use, particularly the timezones.
 
-i need software that will slow down the web and simulate a bad 
-mobile phone internet link.
-
-get lists of fonts so i can start on a settings screen.
-
-event json is based on ics format, icalendar.
-uid: id@sitedomain
-organizers: [{ name: ..., mail:... }]
-dtstart: use standard format
-dtend: use standard format
-summary:
-description:
-locations: [{ name:, street:, city:, zip: }]
-tzid: // ISO timezone id
+The libraries are too huge.  all.js is 335k.  all.min.js is 186k.  main.js is 20k, which isn't too bad.  Code organization sucks.
 
 the css and settings features don't work on android 2.1. the entire
 feature should be disabled for 2.1.  it seems to cause failures unrelated
 to the styling.
-
-dialogs should take up the screen - forget borders.  just a white panel with settings.
 
 the reply box should be a massive box with editable text.
 
@@ -43,4 +27,17 @@ This decorator has:
 	- hide email?
 	- video player renderer
 	- video url -> player renderer
+
+Need some API URLS:
+/1/n/local - get list of latest local news
+/1/n/breaking - get list of breaking news
+/1/n/comments - get list of latest comments
+/1/n/p/12345.html - permalink to a post
+/1/c - get list of upcoming calendar events in ICS format
+/1/c/p/12345.html - permalink to a calendar item
+/1/f - get list of front-page features
+/1/f/p/12345.html - permalink to a featured article
+/1/flag - flag a post, use POST method
+/1/reply - reply to a post, use POST method
+/1/list/all - get all the lists in one
 
