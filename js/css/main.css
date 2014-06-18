@@ -25,6 +25,31 @@ a {
 	color: #8888ff;
 }
 
+/* some icons */
+span.icon {
+	background-image: url(../images/imc-app-icon-sm-wh.png);
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
+#settings-open {
+	margin: 20px 15px;
+	background-position: 72px;
+}
+#thumbscreenbutton {
+	margin: 20px 15px;
+	background-position: 24px;
+}
+.flagbutton {
+	background-position: 0px;
+	vertical-align: middle;
+}
+.likebutton {
+	background-position: 48px;
+	vertical-align: middle;
+}
+
+
 /* article layout */
 
 h2 {

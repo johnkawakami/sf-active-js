@@ -274,8 +274,8 @@ var layoutModule = function ($, EV) {
 		$('<div/>', { class:'disc' }).append(
 			a = $('<span/>', { class:'disc-btn', text: d.numcomments+' comment' }),
 			b = $('<span/>', { class:'disc-btn', text:'reply' }),
-			c = $('<span/>', { class:'disc-btn', text:'flag' }),
-			e = $('<span/>', { class:'disc-btn', text:'like' }),
+			c = $('<span/>', { class:'disc-btn', html:'<span class="icon flagbutton"></span>' }),
+			e = $('<span/>', { class:'disc-btn', html:'<span class="icon likebutton"></span>' }),
 			f = $('<span/>', { class:'disc-btn', text:'share' })
 		).appendTo( $(article) );
 		a.click( function(x){ openComments(d.id,x); } );
