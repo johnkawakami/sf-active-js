@@ -42,6 +42,10 @@ IMC.scrollUp = function () {
 		window.setTimeout( new Function("{$(document).scrollTop("+(pos)+")}"), (divs-i)*20 );
 	}
 };
+IMC.scrollDown = function () {
+	var d = $(document);
+	d.scrollTop(d.height());
+};
 
 //------ sharing library
 IMC.share = {};
@@ -49,6 +53,25 @@ IMC.share.facebook = function() { };
 IMC.share.google = function() { };
 IMC.share.twitter = function() { };
 IMC.share.email = function() { };
+
+//------ commenting
+IMC.postComment = function() {
+	var subject = $('#comment-subject').val();
+	var text = $('#comment-text').val();
+	window.localStorage["scrollToBottom"] = 1;
+	location.reload(); // refresh the page
+};
+IMC.toggleCommentForm = function() {
+	var editor = $('#editor');
+	if (editor.hasClass('hidden')) {
+		editor.removeClass('hidden');
+		$('#disclose').html('&#9660; Add Comment');
+		IMC.scrollDown();
+	} else {
+		editor.addClass('hidden');
+		$('#disclose').html('&#9654; Add Comment');
+	}
+};
 
 var layoutModule = function ($, EV) {
 	// module globals
@@ -122,6 +145,13 @@ var layoutModule = function ($, EV) {
 							insertStory( d.article );
 							insertAttachments( d.attachments );
 							insertComments( d.comments );
+							if (window.localStorage["scrollToBottom"]==1) {
+								window.localStorage["scrollToBottom"] = 0;
+								IMC.scrollDown();
+							}
+							if (values.stb=='1') {
+								IMC.scrollDown();
+							}
 						}
 					); //done
 				}
@@ -258,13 +288,13 @@ var layoutModule = function ($, EV) {
 		if (d.author) { $('#author').html('by '+d.author); }
 		var article = $('#article');
 		article.html('');
-		if (d.media && d.media!="") {
-			imgurl = /<img.+src="(.+?)".+?>/.exec(d.media)[1];
+		if (/audio/.test(d.mime_type)) {
+			article.append('<p><audio controls><source src="'+d.fileurl+'" type="'+d.mime_type+'"></audio></p>');
+		} else if (/image/.test(d.mime_type)) {
 			article.append('<p class="media"><img class="photo" src="'+
-			  imgurl+'"></p>');
+			  d.article.fileurl+'"></p>');
 		} else {
-			imgre = /image/;
-			if (imgre.test(d.mime_type)) { 
+			if (/image/.test(d.mime_type)) { 
 				article.append('<p class="media"><img style="min-width: 40%; max-width:100%" src="'+d.linked_file+'"></p>'); 
 			}
 		}
@@ -272,13 +302,13 @@ var layoutModule = function ($, EV) {
 		if (d.link) { article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>'); }
 
 		$('<div/>', { class:'disc' }).append(
-			a = $('<span/>', { class:'disc-btn', text: d.numcomments+' comment' }),
+			//a = $('<span/>', { class:'disc-btn', text: d.numcomments+' comment' }),
 			b = $('<span/>', { class:'disc-btn', text:'reply' }),
 			c = $('<span/>', { class:'disc-btn', html:'<span class="icon flagbutton"></span>' }),
 			e = $('<span/>', { class:'disc-btn', html:'<span class="icon likebutton"></span>' }),
 			f = $('<span/>', { class:'disc-btn', text:'share' })
 		).appendTo( $(article) );
-		a.click( function(x){ openComments(d.id,x); } );
+		//a.click( function(x){ openComments(d.id,x); } );
 		b.click( function(x){ openReply(d.id,x); } );
 		c.click( function(x){ openFlag(d.id,x); } );
 		e.click( function(x){ openLike(d.id,x); } );
@@ -419,6 +449,9 @@ var layoutModule = function ($, EV) {
 	$('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat")});
 	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
 	$('#blatestcomments' ).on('click',function(){History.pushState(null,"latest comments","?v=comm")});
+	// comment form
+	$('#add-comment-button' ).on('click',IMC.postComment);
+	$('#disclose').on('click',IMC.toggleCommentForm);
 	// settings form elements
 	$('#settings-close').on('click',function(){return closeSettings();});
 	$('#settings-open').on('click',function(){return openSettings();});
@@ -462,25 +495,25 @@ var layoutModule = function ($, EV) {
 			breakingnews = j["breakingnews"];
 			latestcomments = j["latestcomments"];
 
-			localCache = formatArticleList( local );
+			localCache = formatArticleList( local, 0 );
 			$('#local').append( localCache );
-			attachArticleListClickHandler( local );
+			attachArticleListClickHandler( local, 0 );
 
-			breakingnewsCache = formatArticleList( breakingnews );
+			breakingnewsCache = formatArticleList( breakingnews, 0 );
 			$('#breakingnews').append( breakingnewsCache );
-			attachArticleListClickHandler( breakingnews );
+			attachArticleListClickHandler( breakingnews, 0 );
 
 			calendarCache = formatCalendarList( calendar );
 			$('#calendar').append( calendarCache );
 			attachCalendarListClickHandler( calendar );
 
-			featureCache = formatArticleList( feature );
+			featureCache = formatArticleList( feature, 0 );
 			$('#feature').append( featureCache );
-			attachArticleListClickHandler( feature );
+			attachArticleListClickHandler( feature, 0 );
 
-			latestCommentsCache = formatArticleList( latestcomments );
+			latestCommentsCache = formatArticleList( latestcomments, 1 );
 			$('#latestcomments').append( latestCommentsCache );
-			attachArticleListClickHandler( latestcomments );
+			attachArticleListClickHandler( latestcomments, 1 );
 		};
 	/* 
 		Android 2.1 browser won't do callbacks, so you need to use
@@ -510,11 +543,11 @@ var layoutModule = function ($, EV) {
 
 }; // end of the layout module
 
-var attachArticleListClickHandler = function(articles) {
+var attachArticleListClickHandler = function(articles, scrollToBottom) {
 	for(var i=0; i < articles.length; i++) {
 		var row = $('#id-'+articles[i].id);
 		row.on('click',
-			new Function('History.pushState(null,"local","?v=cont&url=http://la.indymedia.org'+articles[i].url+'")') 
+			new Function('History.pushState(null,"local","?v=cont&stb='+ scrollToBottom + '&url=http://la.indymedia.org'+articles[i].url+'")') 
 			);
 		row.html(row.contents().text()); // replaces link with title text
 	}
@@ -532,7 +565,7 @@ var attachCalendarListClickHandler = function(articles) {
 /**
  * json: an array of article link objects
  */
-var formatArticleList = function(json) {
+var formatArticleList = function(json, scrollToBottom) {
 	if (json == null) {
 		console.log("json is null");
 		return;
@@ -540,7 +573,7 @@ var formatArticleList = function(json) {
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];
-		html += '<li id="id-'+j.id+'" class="noselect"><a href="?v=cont&url=http://la.indymedia.org' 
+		html += '<li id="id-'+j.id+'" class="noselect"><a href="?v=cont&stb='+scrollToBottom+'&url=http://la.indymedia.org' 
 		+ j.url
 		+ '">'
 		+ j.title
@@ -591,12 +624,6 @@ var EmbedVideo = function() {
 	return {
 		embedYouTube: embedYouTube,
 		embedDailyMotion: embedDailyMotion
-	};
-};
-
-var EmbedAudio = function() {
-	return {
-		
 	};
 };
 
