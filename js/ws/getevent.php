@@ -51,3 +51,16 @@ if (!file_exists( $pathtofile )) {
 header("Content-type: application/json");
 echo( file_get_contents( $pathtofile ) );
 exit;
+
+// ugly functions that would ruin comprehension
+
+function date_to_dtstamp( $date ) {
+}
+function add_duration( $date, $duration ) {
+}
+function organizer_line( $name, $phone, $email ) {
+}
+function location_line( $short, $long ) {
+}
+function linked_file_to_url( $path ) {
+}

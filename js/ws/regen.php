@@ -21,6 +21,11 @@
 /* fixme - all instances of "feature" should be renamed to "features" 
    including in the css and html */
 
+/**
+ * fixme - next version should conform to the HAL standard, as should the
+ * client  http://tools.ietf.org/html/draft-kelly-json-hal-06
+ */
+
 // machine-dependent configs
 if ( $_SERVER['HTTP_HOST'] == 'indymedia.lo' ) {
 	$sf_active_config_path = "/home/johnk/Sites/la.indymedia.org/local/config/sfactive.cfg";
