@@ -49,15 +49,50 @@ IMC.scrollDown = function () {
 
 //------ sharing library
 IMC.share = {};
-IMC.share.facebook = function() { };
-IMC.share.google = function() { };
-IMC.share.twitter = function() { };
-IMC.share.email = function() { };
+IMC.share.facebook = function(url, title) {
+    return function() {
+        window.open('http://www.facebook.com/sharer.php?u='+url+'&t='+encodeURIComponent(title));
+    }
+};
+IMC.share.google = function(id) { 
+    return function() {
+        window.open('https://plus.google.com/share?url=http://la.indymedia.org/display.php?id='+id);
+    }
+};
+IMC.share.twitter = function(id, title) { 
+    return function() {
+        window.open('http://www.twitter.com/share?text='+encodeURIComponent(title)+'&url=http://la.indymedia.org/display.php?id='+id);
+    }
+};
+IMC.share.email = function(url, title) { 
+    return function() {
+        window.open('mailto:email@example.com?subject='+encodeURIComponent(title)+'&body='+encodeURIComponent(url));
+    }
+};
 
 //------ commenting
-IMC.postComment = function() {
+IMC.postComment = function( id ) {
 	var subject = $('#comment-subject').val();
 	var text = $('#comment-text').val();
+	var author = $('#comment-author').val();
+
+	var url = getProxyUrl('http://la.indymedia.org/js/ws/post.php');
+	data = {
+		"author": author,
+		"subject": subject,
+		"text": text,
+		"parent_id": 123
+	};
+	$.post( url, data,
+		function(result) {
+		}, 'json')
+		.done( function() {
+		})
+		.fail( function() {
+		})
+		.always( function() {
+		});
+
 	window.localStorage["scrollToBottom"] = 1;
 	location.reload(); // refresh the page
 };
@@ -221,15 +256,22 @@ var layoutModule = function ($, EV) {
 		IMC.activateArrow();
 		$('#flag').fadeOut();
 		$('#settingswrapper').fadeOut();
+        $('#flag-fraud').off();
+        $('#flag-racist').off();
+        $('#flag-genocide').off();
+        $('#flag-chatter').off();
+        $('#flag-double').off();
+        $('#flag-ad').off();
+        $('#flag-porn').off();
 		$('#flag').slideUp();
 		return false;
 	}
-	var openShare = function(id,ev) { 
+	var openShare = function(id, url, title, ev) { 
 		var s = $('#share');
-		$('#share-twitter').click( IMC.share.twitter( id ) );
-		$('#share-facebook').click( IMC.share.facebook( id ) );
+		$('#share-twitter').click( IMC.share.twitter( id, title ) );
+		$('#share-facebook').click( IMC.share.facebook( url, title ) );
 		$('#share-google').click( IMC.share.google( id ) );
-		$('#share-email').click( IMC.share.email( id ) );
+		$('#share-email').click( IMC.share.email( url, title ) );
 		closeSettings();
 		closeFlag();
 		IMC.deactivateArrow();
@@ -242,6 +284,10 @@ var layoutModule = function ($, EV) {
 		IMC.activateArrow();
 		$('#share').fadeOut();
 		$('#settingswrapper').fadeOut();
+        $('#share-twitter').off();
+        $('#share-facebook').off();
+        $('#share-google').off();
+        $('#share-email').off();
 		$('#share').slideUp();
 		return false;
 	}
@@ -291,12 +337,15 @@ var layoutModule = function ($, EV) {
 		if (/audio/.test(d.mime_type)) {
 			article.append('<p><audio controls><source src="'+d.fileurl+'" type="'+d.mime_type+'"></audio></p>');
 		} else if (/image/.test(d.mime_type)) {
-			article.append('<p class="media"><img class="photo" src="'+
-			  d.article.fileurl+'"></p>');
+            if (d.image) {
+                var img = d.image.medium || d.image.original;
+                article.append('<p class="media"><img class="photo" src="'+
+                  img+'"></p>');
+            } else {
+                article.append('<p class="media"><img class="photo" src="'+
+                  d.linked_file+'"></p>');
+            }
 		} else {
-			if (/image/.test(d.mime_type)) { 
-				article.append('<p class="media"><img style="min-width: 40%; max-width:100%" src="'+d.linked_file+'"></p>'); 
-			}
 		}
 		article.append(d.article);
 		if (d.link) { article.append('<p><a href="'+d.link+'">'+d.link+'</a></p>'); }
@@ -312,13 +361,13 @@ var layoutModule = function ($, EV) {
 		b.click( function(x){ openReply(d.id,x); } );
 		c.click( function(x){ openFlag(d.id,x); } );
 		e.click( function(x){ openLike(d.id,x); } );
-		f.click( function(x){ openShare(d.id,x); } );
+        f.click( function(x){ openShare(d.id, d.article_url, Encoder.htmlDecode(d.heading), x); } );
 	};
 
 	var insertAttachments = function(d) {
 		var att = $('#attachments');
 		var i = 0;
-		var template = '<div id="article-{{i}}" class="article"><h2>{{heading}}</h2><p class="byline">by {{{author}}}<br />{{{format_created}}}</p><p>{{{article}}}</p><p><a href="{{{linked_file}}}"><img src="{{{linked_file}}}" class="photo" /></a></p>';
+		var template = '<div id="article-{{i}}" class="article"><h2>{{heading}}</h2><p class="byline">by {{{author}}}<br />{{{format_created}}}</p><p>{{{article}}}</p><p><a href="{{{image.original}}}"><img src="{{{image.medium}}}" class="photo" /></a></p>';
 		att.html(''); // clear them
 		d.forEach( 
 			function (a) {
@@ -347,6 +396,7 @@ var layoutModule = function ($, EV) {
 			}
 		);
 	};
+    // fixme - comments don't have images. they can have images.
 	var insertComments = function(d) {
 	  var commentTemplate = '<div id="article-{{i}}" class="comment"><h2>{{{heading}}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{attachment}}}{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
 	  var comm = $('#comments');
@@ -359,7 +409,7 @@ var layoutModule = function ($, EV) {
 				data.article = data.article.replace( /\n/mg, '<br />' );
 			}
 			if (/image/.test(data.mime_type)) {
-				data.attachment = "<img src='"+data.linked_file+"' class='photo'>"
+				data.attachment = "<img src='"+data.image.medium+"' class='photo'>"
 			}
 			data.author = Encoder.htmlDecode(data.author);
 			var text = Mustache.render(commentTemplate, data );
@@ -450,8 +500,8 @@ var layoutModule = function ($, EV) {
 	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
 	$('#blatestcomments' ).on('click',function(){History.pushState(null,"latest comments","?v=comm")});
 	// comment form
-	$('#add-comment-button' ).on('click',IMC.postComment);
-	$('#disclose').on('click',IMC.toggleCommentForm);
+	$('#add-comment-button' ).on( 'click', function(){IMC.postComment(id)});
+	$('#disclose').on('click',function(){IMC.toggleCommentForm(id)});
 	// settings form elements
 	$('#settings-close').on('click',function(){return closeSettings();});
 	$('#settings-open').on('click',function(){return openSettings();});
@@ -510,6 +560,24 @@ var layoutModule = function ($, EV) {
 			featureCache = formatArticleList( feature, 0 );
 			$('#feature').append( featureCache );
 			attachArticleListClickHandler( feature, 0 );
+            insertFeaturePreview(0);
+            insertFeaturePreview(1);
+            insertFeaturePreview(2);
+
+            // fixme - this stuff should be done on the server
+            // insert the images if they exist
+            function insertFeaturePreview(i) {
+                var featElement = $('#id-' + feature[i].id);
+                $.getJSON(getProxyUrl('http://la.indymedia.org'+feature[i].url), function(data) {
+                    var image = $('<img>');
+                    image.load(function(){
+                        featElement.prepend($('<br>'));
+                        featElement.prepend(image);
+                    });
+                    image.attr('src', data.article.linked_file);
+                });
+            }
+
 
 			latestCommentsCache = formatArticleList( latestcomments, 1 );
 			$('#latestcomments').append( latestCommentsCache );

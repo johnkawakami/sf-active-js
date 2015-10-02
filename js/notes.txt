@@ -9,35 +9,23 @@ The libraries are too huge.  all.js is 335k.  all.min.js is 186k.  main.js is 20
 
 the css and settings features don't work on android 2.1. the entire
 feature should be disabled for 2.1.  it seems to cause failures unrelated
-to the styling.
+to the styling.  Use some javascript to detect, and if the user has an
+old browser, send them to a page that sets a cookie, cannotusemobile, and
+then onward to an html site that has responsive layouts.
 
-the reply box should be a massive box with editable text.
 
-A new layout for articles, which looks more like medium.com should be done.  The author should pick a hero image, photo byline, and other features.  This can
-be done by making a table for augmenting the webcast table.  Webcast needs
-some field that will indicate that this otehr table should be consulted for a
-decorator spec.  If a spec exists, an alternative page generator should be
-used to generate the page.
+Need to normalize the features to look more like the newswire stories.
 
-This decorator has:
-  - hero image
-	- text styling features
-	- social media descrptions
-	- list of posts to combine into a photo gallery
-	- hide email?
-	- video player renderer
-	- video url -> player renderer
+Need to put a post's image into the image array.
 
-Need some API URLS:
-/1/n/local - get list of latest local news
-/1/n/breaking - get list of breaking news
-/1/n/comments - get list of latest comments
-/1/n/p/12345.html - permalink to a post
-/1/c - get list of upcoming calendar events in ICS format
-/1/c/p/12345.html - permalink to a calendar item
-/1/f - get list of front-page features
-/1/f/p/12345.html - permalink to a featured article
-/1/flag - flag a post, use POST method
-/1/reply - reply to a post, use POST method
-/1/list/all - get all the lists in one
+Lists of features and articles need url of the thumbnail.
 
+We can detect hero images.  If an image has an aspect ratio of 1:1 to 3:2, and the original is at least 900px wide, we can go hero.
+
+16:9 can work on widescreens, but would need to be cropped for mobile phones. Crop to 3:2.
+
+32:18 -> 27:18.  We can shave off "5" or 15.6% of the width to fit into a 3:2 rectangle.
+
+Go through all the photos and do a histogram of popular sizes.
+
+If the image fits, we then use an alternative layout for the title area.  The IMG tag should use srcset alternates, so narrow layouts load the smaller image and large layouts will use the full resolution.

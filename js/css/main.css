@@ -1,5 +1,5 @@
 /* @import url(http://fonts.googleapis.com/css?family=Libre+Baskerville:400,400italic,700); */
-
+* { box-sizing: border-box; }
 html { 
 	overflow: scrollbars-vertical;
 	overflow-y: scroll;
@@ -198,18 +198,12 @@ div.disc span.disc-btn:nth-child(1) {
 
 /* main screen, the "thumbscreen" */
 
-#thumbscreen ul li.thumb span.label {
-	display: table-cell;
-	vertical-align: middle;
-	width: 119px;
-	height: 119px;
-}
 #thumbscreen ul li.thumb {
 	display: block;
-	float: left;
-	width: 119px;
-	height: 119px;
-	margin: 3pt;
+	width: 98%;
+    padding-top: 20px;
+	height: 60px;
+	margin: 6px;
 	text-align: center;
 	position: relative;
 	-android-border-radius: 5dip;
