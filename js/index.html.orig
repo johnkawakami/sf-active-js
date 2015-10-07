@@ -98,10 +98,8 @@
 </div>
 <div id="disclose" class="content">&#9654; Add Comment</div>
 <div id="editor" class="content hidden">
-    <label>Subject </label><br />
-    <input id="comment-subject" name="subject" type="text" size="40" placeholder="Subject"/><br />
-    <label>Author </label><br />
-    <input id="comment-author" name="author" type="text" size="20" placeholder="Your Name"/><br />
+	<label>Author </label><input id="comment-author" name="author" type="text" size="20" placeholder="Your Name"/><br />
+	<label>Subject </label><input id="comment-subject" name="subject" type="text" size="40" placeholder="Subject"/><br />
 	<textarea id="comment-text" placeholder="enter your comment here"></textarea><br />
 	<input id="add-comment-button" type="button" value="post" />
 </div>

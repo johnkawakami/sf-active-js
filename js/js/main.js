@@ -71,30 +71,51 @@ IMC.share.email = function(url, title) {
 };
 
 //------ commenting
-IMC.postComment = function( id ) {
+IMC.getIdFromQuery = function() {
+    var state = History.getState();
+    var uri = new URI(state.url);	
+    var values = URI.parseQuery(uri.query());
+    var url = values.url;
+    var parts = /\/([0-9]+)\.json$/.exec(url);
+    var id = parts[1];
+    return parseInt(id);
+};
+IMC.postComment = function( evt ) {
+    evt.preventDefault(); 
+    evt.stopPropagation(); 
+
 	var subject = $('#comment-subject').val();
 	var text = $('#comment-text').val();
 	var author = $('#comment-author').val();
 
-	var url = getProxyUrl('http://la.indymedia.org/js/ws/post.php');
+    if (subject=='' || text=='' || author=='') {
+        alert("No empty fields allowed");
+        return;
+    }
+
+    url = '/js/ws/post.php';
 	data = {
 		"author": author,
 		"subject": subject,
 		"text": text,
-		"parent_id": 123
+        "parent_id": IMC.getIdFromQuery()
 	};
+    console.log(data);
 	$.post( url, data,
 		function(result) {
+            // try to force a refresh
+            location.reload();
+            return false;
 		}, 'json')
 		.done( function() {
 		})
 		.fail( function() {
+            alert("Post Failed!");
+            return false;
 		})
 		.always( function() {
 		});
-
 	window.localStorage["scrollToBottom"] = 1;
-	location.reload(); // refresh the page
 };
 IMC.toggleCommentForm = function() {
 	var editor = $('#editor');
@@ -106,6 +127,13 @@ IMC.toggleCommentForm = function() {
 		editor.addClass('hidden');
 		$('#disclose').html('&#9654; Add Comment');
 	}
+};
+IMC.disableCommentDiscloser = function() {
+    $('#editor').addClass('hidden');
+    $('#disclose').addClass('hidden');
+};
+IMC.enableCommentDiscloser = function() {
+    $('#disclose').removeClass('hidden');
 };
 
 var layoutModule = function ($, EV) {
@@ -137,6 +165,11 @@ var layoutModule = function ($, EV) {
 				$(views[v][0]).css('display', 'block');
 				$(document).attr('title', views[v][1]);
 				$('#header-title').html(views[v][1]);
+                if (v=='cont' || v=='publ') {
+                    IMC.enableCommentDiscloser();
+                } else {
+                    IMC.disableCommentDiscloser();
+                }
 			} else {
 				$(views[v][0]).css('display', 'none');
 			}
@@ -172,6 +205,9 @@ var layoutModule = function ($, EV) {
 				if (values.url) {
 					clearContent();
 					displaySwitcher(values.v);
+                    $('#comment-author').val(undefined);
+                    $('#comment-subject').val(undefined);
+                    $('#comment-text').val(undefined);
 					$.getJSON( getProxyUrl(values.url) ).done(
 						function (d, error) {
 							console.log("called loader");
@@ -500,8 +536,8 @@ var layoutModule = function ($, EV) {
 	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
 	$('#blatestcomments' ).on('click',function(){History.pushState(null,"latest comments","?v=comm")});
 	// comment form
-	$('#add-comment-button' ).on( 'click', function(){IMC.postComment(id)});
-	$('#disclose').on('click',function(){IMC.toggleCommentForm(id)});
+    $('#add-comment-button' ).on('click', function(evt){IMC.postComment(evt); return false;});
+	$('#disclose').on('click',function(){IMC.toggleCommentForm()});
 	// settings form elements
 	$('#settings-close').on('click',function(){return closeSettings();});
 	$('#settings-open').on('click',function(){return openSettings();});

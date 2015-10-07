@@ -16,3 +16,9 @@ ul.articlelist li a:visited { color: #444; }
 .eventdate { color: #444; }
 #arrow { background-color: black; border-radius: 15px; opacity: 0.5; }
 
+div.disc span.disc-btn:nth-child(2) {
+    background-color: silver;
+}
+div.disc span.disc-btn:nth-child(3) {
+    background-color: silver;
+}
