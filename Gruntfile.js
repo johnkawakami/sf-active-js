@@ -12,14 +12,14 @@ module.exports = function(grunt) {
         },
         concat: {
             libs: {
-                src: [ 'js/vendor/jquery-1.9.1.min.js',
-                       'js/vendor/jquery-migrate-1.2.1.js',
-                       "js/vendor/history.adapter.jquery.js",
-                       "js/vendor/history.js",
-                       "js/vendor/mustache.js",
-                       "js/vendor/URI.js",
-                       "js/vendor/json2.js",
-                       "js/vendor/qrcodejs/qrcode.js"
+                src: [ 'vendor/jquery-1.9.1.min.js',
+                       'vendor/jquery-migrate-1.2.1.js',
+                       "vendor/history.adapter.jquery.js",
+                       "vendor/history.js",
+                       "vendor/mustache.js",
+                       "vendor/URI.js",
+                       "vendor/json2.js",
+                       "vendor/qrcodejs/qrcode.js"
                     ],
                 dest: 'build/libs.js'
             }
