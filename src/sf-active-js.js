@@ -1,6 +1,6 @@
-
+// this needs to be revised so it'll compile correctly.
 // our namespace
-var IMC = {};
+var IMC = IMC || {};
 
 IMC.arrow = function () {
 	var arrow = $('#arrow');
@@ -21,14 +21,19 @@ IMC.activateArrow = function () {
 		IMC.arrowPoller = window.setInterval( IMC.arrow, 500 );
 	}
 	$('#arrow').on( 'click', IMC.scrollUp );
-}
+};
 IMC.deactivateArrow = function () {
 	$('#arrow').fadeOut();
 	if (IMC.arrowPoller) {
 		window.clearInterval( IMC.arrowPoller );
 		delete(IMC.arrowPoller);
 	}
-}
+};
+IMC.makeScrollUpFrame = function (pos) {
+    return function() {
+        $(document).scrollTop(pos);
+    };
+};
 IMC.scrollUp = function () {
 	var d = $(document);
 	var start = d.scrollTop();
@@ -39,7 +44,7 @@ IMC.scrollUp = function () {
 	var i;
 	for( i = 0; i < divs; i++ ) {
 		pos = i * i * delta / (divsquared) ;
-		window.setTimeout( new Function("{$(document).scrollTop("+(pos)+")}"), (divs-i)*20 );
+        window.setTimeout(IMC.makeScrollUpFrame(pos), (divs-i)*20);
 	}
 };
 IMC.scrollDown = function () {
@@ -52,22 +57,22 @@ IMC.share = {};
 IMC.share.facebook = function(url, title) {
     return function() {
         window.open('http://www.facebook.com/sharer.php?u='+url+'&t='+encodeURIComponent(title));
-    }
+    };
 };
 IMC.share.google = function(id) { 
     return function() {
         window.open('https://plus.google.com/share?url=http://la.indymedia.org/display.php?id='+id);
-    }
+    };
 };
 IMC.share.twitter = function(id, title) { 
     return function() {
         window.open('http://www.twitter.com/share?text='+encodeURIComponent(title)+'&url=http://la.indymedia.org/display.php?id='+id);
-    }
+    };
 };
 IMC.share.email = function(url, title) { 
     return function() {
         window.open('mailto:email@example.com?subject='+encodeURIComponent(title)+'&body='+encodeURIComponent(url));
-    }
+    };
 };
 
 //------ commenting
@@ -89,7 +94,7 @@ IMC.postComment = function( evt ) {
 	var text = $('#comment-text').val();
 	var author = $('#comment-author').val();
 
-    if (subject=='' || text=='' || author=='') {
+    if (subject==='' || text==='' || author==='') {
         alert("No empty fields allowed");
         return;
     }
@@ -118,7 +123,7 @@ IMC.postComment = function( evt ) {
 		})
 		.always( function() {
 		});
-	window.localStorage["scrollToBottom"] = 1;
+	window.localStorage.scrollToBottom = 1;
 };
 IMC.toggleCommentForm = function() {
 	var editor = $('#editor');
@@ -165,7 +170,7 @@ var layoutModule = function ($, EV) {
 			'cont':['#content', 'LA Indymedia']
 			};
 	var displaySwitcher = function(view) {
-		if (view==null || view=="") view='thum';
+		if (view===null || view==="") view='thum';
 		for (var v in views) {
 			if (v == view) {
 				$(views[v][0]).css('display', 'block');
@@ -218,12 +223,12 @@ var layoutModule = function ($, EV) {
 						function (d, error) {
 							console.log("called loader");
 							if (error!='success') alert(error);
-							d.article["numcomments"] = d.comments.length;
+							d.article.numcomments = d.comments.length;
 							insertStory( d.article );
 							insertAttachments( d.attachments );
 							insertComments( d.comments );
-							if (window.localStorage["scrollToBottom"]==1) {
-								window.localStorage["scrollToBottom"] = 0;
+							if (window.localStorage.scrollToBottom==1) {
+								window.localStorage.scrollToBottom = 0;
 								IMC.scrollDown();
 							}
 							if (values.stb=='1') {
@@ -242,6 +247,8 @@ var layoutModule = function ($, EV) {
 				displaySwitcher(values.v);
 				break;
 			case 'thum':
+				displaySwitcher(values.v);
+                break;
 			default:
 				displaySwitcher(values.v);
 			break;
@@ -256,9 +263,9 @@ var layoutModule = function ($, EV) {
 	};
 
 	// -------------- HANDLERS ------------------------
-	var openDisclose = function(id,ev) { console.log(id); }
+    var openDisclose = function(id,ev) { console.log(id); };
 	var openReply = function(id,ev) { 
-	}
+    };
 	var openFlag = function(id,ev) { 
 		var f = $('#flag');
 		var ajaxSubmitFlag = function (id, reason) {
@@ -293,7 +300,7 @@ var layoutModule = function ($, EV) {
 		f.css('position','fixed').css('bottom','0').css('left','0');
 		f.slideDown();
 		return false;
-	}
+    };
 	var closeFlag = function() {
 		IMC.activateArrow();
 		$('#flag').fadeOut();
@@ -307,7 +314,7 @@ var layoutModule = function ($, EV) {
         $('#flag-porn').off();
 		$('#flag').slideUp();
 		return false;
-	}
+    };
 	var openShare = function(id, url, title, ev) { 
 		var s = $('#share');
 		$('#share-twitter').click( IMC.share.twitter( id, title ) );
@@ -321,7 +328,7 @@ var layoutModule = function ($, EV) {
 		s.css('position','fixed').css('bottom','0').css('left','0');
 		s.slideDown();
 		return false;
-	}
+    };
 	var closeShare = function() {
 		IMC.activateArrow();
 		$('#share').fadeOut();
@@ -332,7 +339,7 @@ var layoutModule = function ($, EV) {
         $('#share-email').off();
 		$('#share').slideUp();
 		return false;
-	}
+    };
 	var openSettings = function() {
 		closeShare();
 		closeFlag();
@@ -341,12 +348,12 @@ var layoutModule = function ($, EV) {
 		$('#settings').slideDown();
 		showSettings();
 		return false;
-	}
+    };
 	var closeSettings = function() {
 		$('#settingswrapper').fadeOut();
 		$('#settings').slideUp();
 		return false;
-	}
+    };
 	var showSettings = function() {
 	  var sets = ['black','white','small','medium','large','sans','serif'];
 		$.map( sets, function(a,b) { $('#settings-'+a).removeClass('lit'); } );
@@ -358,7 +365,7 @@ var layoutModule = function ($, EV) {
 		if (fontsize==3) { $('#settings-large').addClass('lit'); }	
 		if (font==1) { $('#settings-sans').addClass('lit'); }	
 		if (font==2) { $('#settings-serif').addClass('lit'); }	
-	}
+    };
 
 
 	// utitiles to fill in the layout
@@ -451,7 +458,7 @@ var layoutModule = function ($, EV) {
 				data.article = data.article.replace( /\n/mg, '<br />' );
 			}
 			if (/image/.test(data.mime_type)) {
-				data.attachment = "<img src='"+data.image.medium+"' class='photo'>"
+                data.attachment = "<img src='"+data.image.medium+"' class='photo'>";
 			}
 			data.author = Encoder.htmlDecode(data.author);
 			var text = Mustache.render(commentTemplate, data );
@@ -464,13 +471,22 @@ var layoutModule = function ($, EV) {
 				b = $('<span/>', { class:'disc-btn', text:'flag' }),
 				c = $('<span/>', { class:'disc-btn', text:'like' })
 			).appendTo( $(comment) );
-			a.click( function (x) { openReply(d.id,x); } );
-			b.click( function (x) { openFlag(d.id,x); } );
-			c.click( function (x) { openLike(d.id,x); } );
+            a.click( makeOpenReplyHander(d.id) );
+            b.click( makeOpenFlagHanlder(d.id) );
+            c.click( makeOpenLikeHandler(d.id) );
 
 			comm.append( comment );
 	  }
 	};
+    function makeOpenReplyHandler(id) {
+        return function (x) { openReply(id, x); };
+    }
+    function makeOpenFlagHandler(id) {
+        return function (x) { openFlag(id, x); };
+    }
+    function makeOpenLikeHandler(id) {
+        return function (x) { openLike(id, x); };
+    }
 
 	// -----------SETTINGS--------------------------
 	//
@@ -493,7 +509,7 @@ var layoutModule = function ($, EV) {
 			exdate.setDate(exdate.getDate() + 3600);
 			document.cookie = 'format='+escape([color,font,fontsize].join(','))+"; expires="+exdate.toUTCString();
 		}
-	}
+    };
 	// recover stylesheet values from localStorage or a cookie
 	// call this before using any styles
 	var recoverCSS = function() {
@@ -508,7 +524,7 @@ var layoutModule = function ($, EV) {
 			var val = document.cookie;
 			var cookies = val.split("; ");
 			for(i=0;i<cookies.length;i++) {
-				if ( cookies[i].indexOf("format") == 0 ) {
+				if ( cookies[i].indexOf("format") === 0 ) {
 					var values = (cookies[i]).substr(7).split(',');
 					color = values[0];
 					font = values[1];
@@ -529,21 +545,21 @@ var layoutModule = function ($, EV) {
 			links[3].href='css/src/fontsize'+fontsize+'.css';
 			$('#fontsize').val(fontsize);
 		}
-	}
+    };
 
 	//-----INITIALIZE----------------
 	//
 	// attach actions to buttons
-	$('#thumbscreenbutton').on('click',function(){History.back()});
-	$('#blocal'   ).on('click',function(){History.pushState(null,"local","?v=loca")});
-	$('#bbreaking').on('click',function(){History.pushState(null,"breaking news","?v=brea")});
-	$('#bcalendar').on('click',function(){History.pushState(null,"calendar","?v=cale")});
-	$('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat")});
-	$('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ")});
-	$('#blatestcomments' ).on('click',function(){History.pushState(null,"latest comments","?v=comm")});
+    $('#thumbscreenbutton').on('click',function(){History.back();});
+    $('#blocal'   ).on('click',function(){History.pushState(null,"local","?v=loca");});
+    $('#bbreaking').on('click',function(){History.pushState(null,"breaking news","?v=brea");});
+    $('#bcalendar').on('click',function(){History.pushState(null,"calendar","?v=cale");});
+    $('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat");});
+    $('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ");});
+    $('#blatestcomments' ).on('click',function(){History.pushState(null,"latest comments","?v=comm");});
 	// comment form
     $('#add-comment-button' ).on('click', function(evt){IMC.postComment(evt); return false;});
-	$('#disclose').on('click',function(){IMC.toggleCommentForm()});
+    $('#disclose').on('click',function(){IMC.toggleCommentForm();});
 	// settings form elements
 	$('#settings-close').on('click',function(){return closeSettings();});
 	$('#settings-open').on('click',function(){return openSettings();});
@@ -581,11 +597,11 @@ var layoutModule = function ($, EV) {
 	// load up headlines from the server
 	var headlineLoader =	function(j) {
 			console.log('loaded the headlines');
-			local = j["local"];
-			feature = j["features"];
-			calendar = j["calendar"];
-			breakingnews = j["breakingnews"];
-			latestcomments = j["latestcomments"];
+			local = j.local;
+			feature = j.features;
+			calendar = j.calendar;
+			breakingnews = j.breakingnews;
+			latestcomments = j.latestcomments;
 
 			localCache = formatArticleList( local, 0 );
 			$('#local').append( localCache );
@@ -653,61 +669,55 @@ var layoutModule = function ($, EV) {
 
 }; // end of the layout module
 
+function makeUrlClickHandler(url, scrollToBottom) {
+    return function() { History.pushState(null,"local","?v=cont&stb=" + scrollToBottom + "&url=http://la.indymedia.org" + url); };
+}
 var attachArticleListClickHandler = function(articles, scrollToBottom) {
 	for(var i=0; i < articles.length; i++) {
 		var row = $('#id-'+articles[i].id);
-		row.on('click',
-			new Function('History.pushState(null,"local","?v=cont&stb='+ scrollToBottom + '&url=http://la.indymedia.org'+articles[i].url+'")') 
-			);
+		row.on('click', makeUrlClickHandler(articles[i].url, scrollToBottom));
 		row.html(row.contents().text()); // replaces link with title text
 	}
-}
+};
 var attachCalendarListClickHandler = function(articles) {
 	for(var i=0; i < articles.length; i++) {
 		var row = $('#id-'+articles[i].id);
-		row.on('click',
-			new Function('History.pushState(null,"local","?v=cont&url=http://indymedia.lo'+articles[i].url+'")') 
-			);
+        row.on('click', makeUrlClickHandler(articles[i].url, 0));
 		var link = $('#id-'+articles[i].id + " a");
 		link.html(link.contents().text()); // replaces link with title text
 	}
-}
+};
 /**
  * json: an array of article link objects
  */
 var formatArticleList = function(json, scrollToBottom) {
-	if (json == null) {
+	if (json === null) {
 		console.log("json is null");
 		return;
 	}
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];
-		html += '<li id="id-'+j.id+'" class="noselect"><a href="?v=cont&stb='+scrollToBottom+'&url=http://la.indymedia.org' 
-		+ j.url
-		+ '">'
-		+ j.title
-		+ '</a></li>';
+		html += '<li id="id-'+j.id+'" class="noselect"><a href="?v=cont&stb='+scrollToBottom+'&url=http://la.indymedia.org' +
+		j.url + 
+        '">' + 
+        j.title + 
+        '</a></li>';
 	  }
 	  html = html + '</ul>';	
 	  return html;
 };
 
 var formatCalendarList = function(json) {
-	if (json == null) {
+	if (json === null) {
 		console.log("json is null");
 		return;
 	}
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];
-			html += '<li id="id-'+j.id+'" class="noselect"><a href="?v=cont&url=http://la.indymedia.org' 
-			+ j.url
-			+ '">'
-			+ j.title
-			+ '</a>'
-			+ "<br />&nbsp;<span class='eventdate'>" + j.start 
-			+ '</span></li>';
+			html += '<li id="id-'+j.id+'" class="noselect"><a href="?v=cont&url=http://la.indymedia.org' +
+			j.url + '">' + j.title + '</a>' + "<br />&nbsp;<span class='eventdate'>" + j.start + '</span></li>';
 	  }
 	  html = html + '</ul>';	
 	  return html;
@@ -773,8 +783,8 @@ var getProxyUrl = function(url) {
 function main($) {
 	var uri = new URI( document.location.href );
 	var search = uri.search(true);
-	var url = search['url']; // means we want to view a specific url
-	var v = search['v']; // means view
+	var url = search.url; // means we want to view a specific url
+	var v = search.v; // means view
 	if ( v ) {
 		console.log('v specified, so doing nothing');
 	} else	if (!url || url==='') {
@@ -788,9 +798,9 @@ function main($) {
 		// /features/year/id.json - features
 		History.replaceState(null, "content", "/?v=cont&url=" + url);
 	}
-	var cache = search['cache'];
+	var cache = search.cache;
 	if (cache=="1") {
-		localStorage['rsstime'] = 0;
+		localStorage.rsstime = 0;
 	}
 	layoutModule($, EmbedVideo() );
 }
