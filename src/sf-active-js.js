@@ -428,6 +428,9 @@ var layoutModule = function ($, EV) {
 					a.author = matches[1];
 					a.article = a.article.replace( /^by .*$/m, '' );
 				}
+                if (! a.image.medium) { 
+                    a.image.medium = a.image.original;
+                }
 				var text = Mustache.render( template, a );
 
 				comment = $.parseHTML( text );
@@ -532,19 +535,8 @@ var layoutModule = function ($, EV) {
 				}
 			}
 		}
-		var links = document.getElementsByTagName('link');
-		if (color>0) {
-			links[1].href='css/src/color'+color+'.css';
-			$('#color').val(color);
-		}
-		if (font>0) {
-			links[2].href='css/src/font'+font+'.css';
-			$('#font').val(font);
-		}
-		if (fontsize>0) {
-			links[3].href='css/src/fontsize'+fontsize+'.css';
-			$('#fontsize').val(fontsize);
-		}
+        // add a delay to give link tags to get inserted
+        window.setTimeout(setCSS, 100);
     };
 
 	//-----INITIALIZE----------------
@@ -657,7 +649,7 @@ var layoutModule = function ($, EV) {
 	);
 	*/
 	$.getJSON(
-		getProxyUrl("http://la.indymedia.org/js/ws/regen.php?s=combined"),
+		getProxyUrl("http://la.indymedia.org/js/ws/regen.php"),
 		headlineLoader,
 		function (j) {
 			console.log("some kind of error happened");

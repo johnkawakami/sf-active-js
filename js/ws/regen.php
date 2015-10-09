@@ -58,7 +58,12 @@ if (isset($_GET['callback'])) {
 }
 
 // parameter s selects which data to get
-$select = $_GET['s'];
+if (isset($_GET['s'])) {
+    $select = $_GET['s'];
+} else {
+    $select = 'combined';
+}
+
 switch($select) {
   // the individual selects are going to be deprecated
 	// the combined is all we should use
@@ -82,6 +87,16 @@ switch($select) {
 	break;
 }
 header('Content-Type: text/javascript');
+header('Cache-Control: max-age=3600, public');
+$etag = md5($output);
+header('ETag: ' . $etag);
+
+// check if-none-match header to see if it matches the etag.
+if ($_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
+    header('HTTP/ 304 Not Modified');
+    exit();
+}
+
 if ($callback) echo $callback . '(';
 echo $output; 
 if ($callback) echo ');';

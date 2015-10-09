@@ -27,7 +27,22 @@
  *		 - replaced string concatonation in numEncode with string builder, push and join for peformance with ammendments by Rob Reid
  */
 
-Encoder = {
+(function (root, factory) {
+  if (typeof exports === "object" && exports) {
+    factory(exports); // CommonJS
+  } else {
+    var Encoder = {};
+    factory(Encoder);
+    if (typeof define === "function" && define.amd) {
+      define(Encoder); // AMD
+    } else {
+      root.Encoder = Encoder; // <script>
+    }
+  }
+}(this, function (Encoder) {
+  Encoder = {
+    name : "encoder.js",
+    version : "0.7.2",
 
 	// When encoding do we convert characters into html or numerical entities
 	EncodeType : "entity",  // entity OR numerical
@@ -240,4 +255,4 @@ Encoder = {
 		return -1;
 	}
 
-}
+};}));

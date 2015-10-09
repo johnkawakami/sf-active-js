@@ -12,10 +12,11 @@ module.exports = function(grunt) {
         },
         concat: {
             libs: {
-                src: [ 'vendor/jquery-1.9.1.min.js',
+                src: [ 
                        'vendor/jquery-migrate-1.2.1.js',
                        "vendor/history.adapter.jquery.js",
                        "vendor/history.js",
+                       "js/vendor/encoder.js",
                        "vendor/mustache.js",
                        "vendor/URI.js",
                        "vendor/json2.js",
@@ -37,10 +38,17 @@ module.exports = function(grunt) {
                 dest: 'js/js/libs.js'
             }
         },
+        cssmin: {
+            build: {
+                src: 'src/main.css',
+                dest: 'js/css/main.css'
+            }
+        }
     });
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.registerTask('default', ['concat','uglify']);
+    grunt.registerTask('default', ['concat','uglify','cssmin']);
 };

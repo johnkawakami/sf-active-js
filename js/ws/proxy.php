@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD']=='GET') {
 		curl_exec($ch);
 		curl_close($ch);
 	}
-	else if (preg_match( '/\/js\/ws\/regen\.php\?s=combined$/', $url ))
+	else if (preg_match( '/\/js\/ws\/regen\.php$/', $url ))
 	{
 		header("Content-Type: application/json");
 		$ch = curl_init( $url );
