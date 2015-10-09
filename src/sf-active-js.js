@@ -154,7 +154,7 @@ var layoutModule = function ($, EV) {
 	var featureCache = null;
 	var localCache = null;
 	var fontsize=1; 
-  var color=1;
+    var color=1;
 	var font=1;
 
 	// display switcher
@@ -204,7 +204,8 @@ var layoutModule = function ($, EV) {
 	/** 
 	 * state change hander - routes all the URLs to the correct screen 
 	 * param 'v' picks a view
-	 * param 'u' sets a url if needed
+	 * param 'url' sets a url if needed
+     * fixme - doesn't work in mobile chrome.
 	 */
 	var displayFromQuery = function () {
 		var state = History.getState();
@@ -219,10 +220,8 @@ var layoutModule = function ($, EV) {
                     $('#comment-author').val(undefined);
                     $('#comment-subject').val(undefined);
                     $('#comment-text').val(undefined);
-					$.getJSON( getProxyUrl(values.url) ).done(
-						function (d, error) {
-							console.log("called loader");
-							if (error!='success') alert(error);
+					$.getJSON( getProxyUrl(values.url),
+                    function (d) {
 							d.article.numcomments = d.comments.length;
 							insertStory( d.article );
 							insertAttachments( d.attachments );
@@ -235,7 +234,13 @@ var layoutModule = function ($, EV) {
 								IMC.scrollDown();
 							}
 						}
-					); //done
+					) 
+                    .fail(function(jqXHR, status, errorThrown) {
+                        alert(status);
+                        alert(jqHXR.statusText);
+                        alert(jqHXR.statusCode());
+                        alert(jqHXR.getAllResponseHeaders());
+                    });
 				}
 				break;				
 			case 'loca':
@@ -566,24 +571,10 @@ var layoutModule = function ($, EV) {
 	//$('#settings-close').on('click',function(){History.popState()});
 
 	// attach state handlers for history
-  History.Adapter.bind(window, 'statechange', displayFromQuery);
-  // for starters, call the handler
-  displayFromQuery();
+    History.Adapter.bind(window, 'statechange', displayFromQuery);
 
-	// create a shortened url for the long url
-	/*
-	ferus = new FerusUrl( appkey );
-	ferus.create( { 'url': window.location.href, 'size': 5, 'case': 'lower' } );
-	*/
+    displayFromQuery();
 
-	// load up the bottom area
-	/*
-	new QRCode( document.getElementById('qrcode'), {
-		text: window.location.href,
-		width: 128,
-		height: 128
-	});
-	*/
 	$('#publish').append('publish');
 
 	// load up headlines from the server
@@ -658,7 +649,6 @@ var layoutModule = function ($, EV) {
 
 	// reload saved settings for CSS
 	recoverCSS();
-
 }; // end of the layout module
 
 function makeUrlClickHandler(url, scrollToBottom) {
@@ -795,5 +785,6 @@ function main($) {
 		localStorage.rsstime = 0;
 	}
 	layoutModule($, EmbedVideo() );
+
 }
 jQuery(main);
