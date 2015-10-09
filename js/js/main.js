@@ -84,6 +84,7 @@ IMC.postComment = function( evt ) {
     evt.preventDefault(); 
     evt.stopPropagation(); 
 
+
 	var subject = $('#comment-subject').val();
 	var text = $('#comment-text').val();
 	var author = $('#comment-author').val();
@@ -92,9 +93,11 @@ IMC.postComment = function( evt ) {
         alert("No empty fields allowed");
         return;
     }
+    var csrf_token = $('#editor').attr('data-csrf-token');
 
     url = '/js/ws/post.php';
 	data = {
+        "csrf_token": csrf_token,
 		"author": author,
 		"subject": subject,
 		"text": text,
@@ -123,6 +126,9 @@ IMC.toggleCommentForm = function() {
 		editor.removeClass('hidden');
 		$('#disclose').html('&#9660; Add Comment');
 		IMC.scrollDown();
+        $.get('/js/ws/csrf.php', function(result) {
+            $('#editor').attr('data-csrf-token', result.csrf_token);
+        }, 'json');
 	} else {
 		editor.addClass('hidden');
 		$('#disclose').html('&#9654; Add Comment');

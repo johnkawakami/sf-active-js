@@ -23,7 +23,7 @@ if ($article_fields['parent_id'] > 0) {
 	exit; // bail out if it's not a parent article
 }
 $link = $GLOBALS['news_url'].$pathtofile.$id.'.json';
-header("Location: http://la.indymedia.org/js/?v=cont&url=$link")
+header("Location: http://la.indymedia.org/js/?v=cont&url=$link");
 // header("Location: $link");
 exit();
 

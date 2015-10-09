@@ -19,7 +19,7 @@ $month = substr($ts_date,5,2);
 $year = substr($ts_date,0,4);
 $pathtofile = "$year/$month/";
 if ($article_fields['parent_id'] > 0) {
-  echo "not a parent article";
+    echo "not a parent article";
 	exit; // bail out if it's not a parent article
 }
 $link = $GLOBALS['news_url'].$pathtofile.$id.'.json';

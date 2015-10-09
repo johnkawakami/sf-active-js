@@ -8,7 +8,14 @@ content to the test environment.
  */
 
 include("shared/global.cfg");
-include('local.cfg');
+require_once SF_CLASS_PATH.'/csrf_class.inc';
+
+$csrf_token = filter_input(INPUT_POST, 'csrf_token',
+    FILTER_VALIDATE_REGEXP, array('options'=>array('regexp'=>"/[0-9a-f]{1,32}/")));
+$csrf = new CSRF();
+if (! $csrf->validate_token($csrf_token)) {
+    http_error_400("Invalid Form ".$csrf_token);
+}
 
 $author = filter_var($_POST['author'], FILTER_SANITIZE_SPECIAL_CHARS);
 $subject = filter_var($_POST['subject'], FILTER_SANITIZE_SPECIAL_CHARS);
@@ -50,6 +57,7 @@ $article->render_everything();
 $article->cache_to_disk();
 
 header("HTTP/ 200 OK", true, 200);
+header('Content-Type: application/json');
 $out = array('status'=>200, 'author'=>$author, 'subject'=>$subject, 'text'=>$text);
 echo json_encode($out);
 exit();
@@ -59,6 +67,7 @@ exit();
 function http_error_400($msg) {
     header("HTTP/ 400 $msg", true, 400);
     header('Content-Type: application/json');
-    echo '{"status":400, "error":"$msg"}';
+    $out = array('status'=>400, 'error'=>$msg);
+    echo json_encode($out); 
     exit();
 }
