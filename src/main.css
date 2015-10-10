@@ -146,6 +146,8 @@ ul.articlelist li a:visited {
 }
 #summary {
 	font-style: italic;
+    font-size: 140%;
+    line-height: 150%;
 }
 #author {
 	font-size: 90%;
@@ -156,6 +158,10 @@ ul.articlelist li a:visited {
 #article {
 	display: block;
 	padding-bottom: 3%:
+}
+
+#attachments .article p {
+    line-height: 1.8em;
 }
 
 /* discussion and feedback buttons */
@@ -239,8 +245,9 @@ div.disc span.disc-btn:nth-child(1) {
 
 /* used by commenting tool but can be used by anything */
 
-.hidden { display: none; }
-
+.hidden { 
+    display: none;
+}
 
 
 /* settings dialog */
@@ -340,8 +347,11 @@ div.disc span.disc-btn:nth-child(1) {
 }
 #disclose { 
 	background-color: rgba(64,64,64,0.3);
-	padding: 5px 5px 10px 5px;
+	padding: 12px 5px 15px 15px;
 	margin-bottom: 0px;
+    margin-top: 20px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 .noselect {

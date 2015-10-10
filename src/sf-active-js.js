@@ -127,15 +127,17 @@ IMC.postComment = function( evt ) {
 };
 IMC.toggleCommentForm = function() {
 	var editor = $('#editor');
-	if (editor.hasClass('hidden')) {
-		editor.removeClass('hidden');
+	if (editor.css('display')=='none') {
+        editor.slideDown({
+            duration: 500, 
+            progress: IMC.scrollDown
+        });
 		$('#disclose').html('&#9660; Add Comment');
-		IMC.scrollDown();
         $.get('/js/ws/csrf.php', function(result) {
             $('#editor').attr('data-csrf-token', result.csrf_token);
         }, 'json');
 	} else {
-		editor.addClass('hidden');
+        editor.slideUp(500);
 		$('#disclose').html('&#9654; Add Comment');
 	}
 };
@@ -372,6 +374,7 @@ var layoutModule = function ($, EV) {
 
 	// utitiles to fill in the layout
 	var clearContent = function() {
+		$('#topphoto').html('');
 		$('#heading').html('');
 		$('#summary').html('');
 		$('#author').html('');
@@ -390,10 +393,10 @@ var layoutModule = function ($, EV) {
 		} else if (/image/.test(d.mime_type)) {
             if (d.image) {
                 var img = d.image.medium || d.image.original;
-                article.append('<p class="media"><img class="photo" src="'+
+                $('#topphoto').append('<p class="media"><img class="photo" src="'+
                   img+'"></p>');
             } else {
-                article.append('<p class="media"><img class="photo" src="'+
+                $('#topphoto').append('<p class="media"><img class="photo" src="'+
                   d.linked_file+'"></p>');
             }
 		} else {
@@ -418,7 +421,7 @@ var layoutModule = function ($, EV) {
 	var insertAttachments = function(d) {
 		var att = $('#attachments');
 		var i = 0;
-		var template = '<div id="article-{{i}}" class="article"><h2>{{heading}}</h2><p class="byline">by {{{author}}}<br />{{{format_created}}}</p><p>{{{article}}}</p><p><a href="{{{image.original}}}"><img src="{{{image.medium}}}" class="photo" /></a></p>';
+		var template = '<div id="article-{{i}}" class="article"><h2>{{heading}}</h2><p class="byline">by {{{author}}}<br />{{{format_created}}}</p><p><a href="{{{image.original}}}"><img src="{{{image.medium}}}" class="photo" /></a></p><p>{{{article}}}</p>';
 		att.html(''); // clear them
 		d.forEach( 
 			function (a) {
@@ -439,8 +442,8 @@ var layoutModule = function ($, EV) {
 				// create some buttons
 				$('<div/>', { class:'disc' }).append(
 					a = $('<span/>', { class:'disc-btn', text:'reply' }),
-					b = $('<span/>', { class:'disc-btn', text:'flag' }),
-					c = $('<span/>', { class:'disc-btn', text:'like' })
+                    b = $('<span/>', { class:'disc-btn', html:'<span class="icon flagbutton"></span>' }),
+                    c = $('<span/>', { class:'disc-btn', html:'<span class="icon likebutton"></span>' })
 				).appendTo( $(comment) );
 				a.click( function (x) { openReply(d.id,x); } );
 				b.click( function (x) { openFlag(d.id,x); } );
@@ -569,6 +572,8 @@ var layoutModule = function ($, EV) {
 
 	// attach state handlers for history
     History.Adapter.bind(window, 'statechange', displayFromQuery);
+
+    $('#editor').hide(0);
 
     displayFromQuery();
 
