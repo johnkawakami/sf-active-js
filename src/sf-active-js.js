@@ -236,10 +236,7 @@ var layoutModule = function ($, EV) {
 						}
 					) 
                     .fail(function(jqXHR, status, errorThrown) {
-                        alert(status);
-                        alert(jqHXR.statusText);
-                        alert(jqHXR.statusCode());
-                        alert(jqHXR.getAllResponseHeaders());
+                        alert("There was an error. Try reloading the page.");
                     });
 				}
 				break;				
