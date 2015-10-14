@@ -125,6 +125,11 @@ IMC.postComment = function( evt ) {
 		});
 	window.localStorage.scrollToBottom = 1;
 };
+IMC.hideCommentForm = function() {
+	var editor = $('#editor');
+    editor.hide(0);
+    $('#disclose').html('&#9654; Add Comment');
+};
 IMC.toggleCommentForm = function() {
 	var editor = $('#editor');
 	if (editor.css('display')=='none') {
@@ -137,8 +142,7 @@ IMC.toggleCommentForm = function() {
             $('#editor').attr('data-csrf-token', result.csrf_token);
         }, 'json');
 	} else {
-        editor.slideUp(500);
-		$('#disclose').html('&#9654; Add Comment');
+        IMC.hideCommentForm();
 	}
 };
 IMC.disableCommentDiscloser = function() {
@@ -178,6 +182,7 @@ var layoutModule = function ($, EV) {
 				$(views[v][0]).css('display', 'block');
 				$(document).attr('title', views[v][1]);
 				$('#header-title').html(views[v][1]);
+                IMC.hideCommentForm();
                 if (v=='cont' || v=='publ') {
                     IMC.enableCommentDiscloser();
                 } else {
@@ -214,6 +219,13 @@ var layoutModule = function ($, EV) {
 		var uri = new URI(state.url);	
 		var values = URI.parseQuery(uri.query());
 
+        /*
+        console.log('displayFromQuery');
+        if (IMC.currentURL === values.url) {
+            console.log('already here');
+            return;
+        }
+        */
 		switch(values.v) {
 			case 'cont': 
 				if (values.url) {
@@ -235,6 +247,7 @@ var layoutModule = function ($, EV) {
 							if (values.stb=='1') {
 								IMC.scrollDown();
 							}
+                            IMC.currentURL = values.url;
 						}
 					) 
                     .fail(function(jqXHR, status, errorThrown) {
@@ -383,6 +396,7 @@ var layoutModule = function ($, EV) {
 		$('#comments').html('');
 	};
 	function insertStory(d) {
+        console.log('insertStory');
 		if (d.heading) { $('#heading').html(d.heading); }
 		if (d.summary) { $('#summary').html(d.summary); }
 		if (d.author) { $('#author').html('by '+d.author); }
@@ -453,6 +467,15 @@ var layoutModule = function ($, EV) {
 			}
 		);
 	};
+    function makeOpenReplyHandler(id) {
+        return function (x) { openReply(id, x); };
+    }
+    function makeOpenFlagHandler(id) {
+        return function (x) { openFlag(id, x); };
+    }
+    function makeOpenLikeHandler(id) {
+        return function (x) { openLike(id, x); };
+    }
     // fixme - comments don't have images. they can have images.
 	function insertComments(d) {
 	  var commentTemplate = '<div id="article-{{i}}" class="comment"><h2>{{{heading}}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{attachment}}}{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
@@ -479,22 +502,13 @@ var layoutModule = function ($, EV) {
 				b = $('<span/>', { class:'disc-btn', text:'flag' }),
 				c = $('<span/>', { class:'disc-btn', text:'like' })
 			).appendTo( $(comment) );
-            a.click( makeOpenReplyHander(d.id) );
-            b.click( makeOpenFlagHanlder(d.id) );
+            a.click( makeOpenReplyHandler(d.id) );
+            b.click( makeOpenFlagHandler(d.id) );
             c.click( makeOpenLikeHandler(d.id) );
 
 			comm.append( comment );
 	  }
 	};
-    function makeOpenReplyHandler(id) {
-        return function (x) { openReply(id, x); };
-    }
-    function makeOpenFlagHandler(id) {
-        return function (x) { openFlag(id, x); };
-    }
-    function makeOpenLikeHandler(id) {
-        return function (x) { openLike(id, x); };
-    }
 
 	// -----------SETTINGS--------------------------
 	//
@@ -588,21 +602,21 @@ var layoutModule = function ($, EV) {
 			breakingnews = j.breakingnews;
 			latestcomments = j.latestcomments;
 
-			localCache = formatArticleList( local, 0 );
+			localCache = formatArticleList( 'local', local, 0 );
 			$('#local').append( localCache );
-			attachArticleListClickHandler( local, 0 );
+			attachArticleListClickHandler( 'local', local, 0 );
 
-			breakingnewsCache = formatArticleList( breakingnews, 0 );
+			breakingnewsCache = formatArticleList( 'breaking', breakingnews, 0 );
 			$('#breakingnews').append( breakingnewsCache );
-			attachArticleListClickHandler( breakingnews, 0 );
+			attachArticleListClickHandler( 'breaking', breakingnews, 0 );
 
 			calendarCache = formatCalendarList( calendar );
 			$('#calendar').append( calendarCache );
 			attachCalendarListClickHandler( calendar );
 
-			featureCache = formatArticleList( feature, 0 );
+			featureCache = formatArticleList( 'feature', feature, 0 );
 			$('#feature').append( featureCache );
-			attachArticleListClickHandler( feature, 0 );
+			attachArticleListClickHandler( 'feature', feature, 0 );
             insertFeaturePreview(0);
             insertFeaturePreview(1);
             insertFeaturePreview(2);
@@ -622,9 +636,11 @@ var layoutModule = function ($, EV) {
             }
 
 
-			latestCommentsCache = formatArticleList( latestcomments, 1 );
+            // fixme - we need to send a css-name prefix into formatArticleList so each of these
+            // is correctly namespaced
+			latestCommentsCache = formatArticleList( 'comment', latestcomments, 1 );
 			$('#latestcomments').append( latestCommentsCache );
-			attachArticleListClickHandler( latestcomments, 1 );
+			attachArticleListClickHandler( 'comment', latestcomments, 1 );
 		};
 	/* 
 		Android 2.1 browser won't do callbacks, so you need to use
@@ -654,18 +670,20 @@ var layoutModule = function ($, EV) {
 }; // end of the layout module
 
 function makeUrlClickHandler(url, scrollToBottom) {
-    return function() { History.pushState(null,"local","?v=cont&stb=" + scrollToBottom + "&url=http://la.indymedia.org" + url); };
+    return function() { 
+        History.pushState(null,"local","?v=cont&stb=" + scrollToBottom + "&url=http://la.indymedia.org" + url); 
+    };
 }
-var attachArticleListClickHandler = function(articles, scrollToBottom) {
+var attachArticleListClickHandler = function(prefix, articles, scrollToBottom) {
 	for(var i=0; i < articles.length; i++) {
-		var row = $('#id-'+articles[i].id);
+		var row = $('#'+prefix+'-id-'+articles[i].id);
 		row.on('click', makeUrlClickHandler(articles[i].url, scrollToBottom));
-		row.html(row.contents().text()); // replaces link with title text
+        row.html(row.contents().text()); // replaces link with title text
 	}
 };
 var attachCalendarListClickHandler = function(articles) {
 	for(var i=0; i < articles.length; i++) {
-		var row = $('#id-'+articles[i].id);
+		var row = $('#calendar-id-'+articles[i].id);
         row.on('click', makeUrlClickHandler(articles[i].url, 0));
 		var link = $('#id-'+articles[i].id + " a");
 		link.html(link.contents().text()); // replaces link with title text
@@ -674,7 +692,7 @@ var attachCalendarListClickHandler = function(articles) {
 /**
  * json: an array of article link objects
  */
-function formatArticleList(json, scrollToBottom) {
+function formatArticleList(prefix, json, scrollToBottom) {
 	if (json === null) {
 		console.log("json is null");
 		return;
@@ -682,7 +700,7 @@ function formatArticleList(json, scrollToBottom) {
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];
-		html += '<li id="id-'+j.id+'" class="noselect"><a href="?v=cont&stb='+scrollToBottom+'&url=http://la.indymedia.org' +
+		html += '<li id="'+prefix+'-id-'+j.id+'" class="noselect"><a href="?v=cont&stb='+scrollToBottom+'&url=http://la.indymedia.org' +
 		j.url + 
         '">' + 
         j.title + 
@@ -700,7 +718,7 @@ function formatCalendarList(json) {
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];
-			html += '<li id="id-'+j.id+'" class="noselect"><a href="?v=cont&url=http://la.indymedia.org' +
+			html += '<li id="calendar-id-'+j.id+'" class="noselect"><a href="?v=cont&url=http://la.indymedia.org' +
 			j.url + '">' + j.title + '</a>' + "<br />&nbsp;<span class='eventdate'>" + j.start + '</span></li>';
 	  }
 	  html = html + '</ul>';	

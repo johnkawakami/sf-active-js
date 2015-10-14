@@ -43,6 +43,16 @@ module.exports = function(grunt) {
                 src: 'src/main.css',
                 dest: 'js/css/main.css'
             }
+        },
+        compress: {
+            options: {
+                archive: 'js.zip',
+                mode: 'zip',
+                pretty: true
+            },
+            build: {
+                src: ['js/**/*']
+            }
         }
     });
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -50,5 +60,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.registerTask('default', ['concat','uglify','cssmin']);
+    grunt.registerTask('release', ['concat','uglify','cssmin', 'compress']);
 };
