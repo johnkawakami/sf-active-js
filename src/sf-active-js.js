@@ -209,7 +209,7 @@ var layoutModule = function ($, EV) {
 	 * param 'url' sets a url if needed
      * fixme - doesn't work in mobile chrome.
 	 */
-	var displayFromQuery = function () {
+	function displayFromQuery() {
 		var state = History.getState();
 		var uri = new URI(state.url);	
 		var values = URI.parseQuery(uri.query());
@@ -267,10 +267,10 @@ var layoutModule = function ($, EV) {
 	};
 
 	// -------------- HANDLERS ------------------------
-    var openDisclose = function(id,ev) { console.log(id); };
-	var openReply = function(id,ev) { 
+    function openDisclose(id,ev) { console.log(id); };
+	function openReply(id,ev) { 
     };
-	var openFlag = function(id,ev) { 
+	function openFlag(id,ev) { 
 		var f = $('#flag');
 		var ajaxSubmitFlag = function (id, reason) {
 			return function() {
@@ -305,7 +305,7 @@ var layoutModule = function ($, EV) {
 		f.slideDown();
 		return false;
     };
-	var closeFlag = function() {
+	function closeFlag() {
 		IMC.activateArrow();
 		$('#flag').fadeOut();
 		$('#settingswrapper').fadeOut();
@@ -319,7 +319,7 @@ var layoutModule = function ($, EV) {
 		$('#flag').slideUp();
 		return false;
     };
-	var openShare = function(id, url, title, ev) { 
+	function openShare(id, url, title, ev) { 
 		var s = $('#share');
 		$('#share-twitter').click( IMC.share.twitter( id, title ) );
 		$('#share-facebook').click( IMC.share.facebook( url, title ) );
@@ -333,7 +333,7 @@ var layoutModule = function ($, EV) {
 		s.slideDown();
 		return false;
     };
-	var closeShare = function() {
+	function closeShare() {
 		IMC.activateArrow();
 		$('#share').fadeOut();
 		$('#settingswrapper').fadeOut();
@@ -344,7 +344,7 @@ var layoutModule = function ($, EV) {
 		$('#share').slideUp();
 		return false;
     };
-	var openSettings = function() {
+	function openSettings() {
 		closeShare();
 		closeFlag();
 		IMC.deactivateArrow();
@@ -353,12 +353,12 @@ var layoutModule = function ($, EV) {
 		showSettings();
 		return false;
     };
-	var closeSettings = function() {
+	function closeSettings() {
 		$('#settingswrapper').fadeOut();
 		$('#settings').slideUp();
 		return false;
     };
-	var showSettings = function() {
+	function showSettings() {
 	  var sets = ['black','white','small','medium','large','sans','serif'];
 		$.map( sets, function(a,b) { $('#settings-'+a).removeClass('lit'); } );
 
@@ -373,7 +373,7 @@ var layoutModule = function ($, EV) {
 
 
 	// utitiles to fill in the layout
-	var clearContent = function() {
+	function clearContent() {
 		$('#topphoto').html('');
 		$('#heading').html('');
 		$('#summary').html('');
@@ -382,7 +382,7 @@ var layoutModule = function ($, EV) {
 		$('#attachments').html('');
 		$('#comments').html('');
 	};
-	var insertStory = function(d) {
+	function insertStory(d) {
 		if (d.heading) { $('#heading').html(d.heading); }
 		if (d.summary) { $('#summary').html(d.summary); }
 		if (d.author) { $('#author').html('by '+d.author); }
@@ -418,7 +418,7 @@ var layoutModule = function ($, EV) {
         f.click( function(x){ openShare(d.id, d.article_url, Encoder.htmlDecode(d.heading), x); } );
 	};
 
-	var insertAttachments = function(d) {
+	function insertAttachments(d) {
 		var att = $('#attachments');
 		var i = 0;
 		var template = '<div id="article-{{i}}" class="article"><h2>{{heading}}</h2><p class="byline">by {{{author}}}<br />{{{format_created}}}</p><p><a href="{{{image.original}}}"><img src="{{{image.medium}}}" class="photo" /></a></p><p>{{{article}}}</p>';
@@ -454,7 +454,7 @@ var layoutModule = function ($, EV) {
 		);
 	};
     // fixme - comments don't have images. they can have images.
-	var insertComments = function(d) {
+	function insertComments(d) {
 	  var commentTemplate = '<div id="article-{{i}}" class="comment"><h2>{{{heading}}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{attachment}}}{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
 	  var comm = $('#comments');
 	  comm.html(''); // clear it out
@@ -503,7 +503,7 @@ var layoutModule = function ($, EV) {
 	// url from the cookie values of these different settings.  So they'll have names like 
 	// theme-1-5-2.css.  There are potentialy dozens or hundreds of css files, each very short, like < 1k.
 	// I should be using an ID attribute on the link tags. -fixme
-	var setCSS = function() {
+	function setCSS() {
 		var links = document.getElementsByTagName('link');
 		links[1].href='css/src/color'+color+'.css';
 		links[2].href='css/src/font'+font+'.css';
@@ -520,7 +520,7 @@ var layoutModule = function ($, EV) {
     };
 	// recover stylesheet values from localStorage or a cookie
 	// call this before using any styles
-	var recoverCSS = function() {
+	function recoverCSS() {
 		if (localStorage) {
 			color = localStorage['imc-js.color'];
 			if (!color) color=2;
@@ -580,7 +580,7 @@ var layoutModule = function ($, EV) {
 	$('#publish').append('publish');
 
 	// load up headlines from the server
-	var headlineLoader =	function(j) {
+	function headlineLoader(j) {
 			console.log('loaded the headlines');
 			local = j.local;
 			feature = j.features;
@@ -674,7 +674,7 @@ var attachCalendarListClickHandler = function(articles) {
 /**
  * json: an array of article link objects
  */
-var formatArticleList = function(json, scrollToBottom) {
+function formatArticleList(json, scrollToBottom) {
 	if (json === null) {
 		console.log("json is null");
 		return;
@@ -692,7 +692,7 @@ var formatArticleList = function(json, scrollToBottom) {
 	  return html;
 };
 
-var formatCalendarList = function(json) {
+function formatCalendarList(json) {
 	if (json === null) {
 		console.log("json is null");
 		return;
@@ -710,7 +710,7 @@ var formatCalendarList = function(json) {
 // useful modules
 var EmbedVideo = function() {
 	/* finds plain youtube urls and turns them into embeds */
-	var embedYouTube = function (s) {
+	function embedYouTube(s) {
 		var ytre = /(http:\/\/www\.)*youtube.com\/watch\?v=([a-zA-Z]{4,16})/;
 		var output = [];
 		var i = 0;
@@ -723,7 +723,7 @@ var EmbedVideo = function() {
 		}
 		return s + output.join();
 	};
-	var embedDailyMotion = function (s) {
+	function embedDailyMotion(s) {
 	};
 	return {
 		embedYouTube: embedYouTube,
@@ -753,7 +753,7 @@ var EmbedVideo = function() {
 	 display or hide dialog boxes.
 */
 // converts a regular url into a url pulled by the local proxy script
-var getProxyUrl = function(url) {
+function getProxyUrl(url) {
 	if (document.location.href.match('indymedia.lo')||
 		  document.location.href.match('192.168.111.4')) {
 		return "/js/ws/proxy.php?url=" +  escape(url);
