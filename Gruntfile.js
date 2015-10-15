@@ -53,6 +53,20 @@ module.exports = function(grunt) {
             build: {
                 src: ['js/**/*']
             }
+        },
+        scp: {
+            options: {
+                host: 'slaptech.net',
+                port: 2222,
+                username: 'johnk',
+                privateKey: grunt.file.read('/home/johnk/.ssh/id_rsa'),
+                path: '/home/johnk',
+            },
+            build: {
+                cwd: '/home/johnk/Sites/la.indymedia.org/public/sf-active-js',
+                src: 'js.zip', // file to uplload
+                dest: '', // destination directory relative to home root
+            }
         }
     });
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -61,6 +75,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-scp');
     grunt.registerTask('default', ['concat','uglify','cssmin']);
-    grunt.registerTask('release', ['concat','uglify','cssmin', 'compress']);
+    grunt.registerTask('release', ['concat','uglify','cssmin', 'compress', 'scp']);
 };
