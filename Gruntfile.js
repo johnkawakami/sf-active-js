@@ -1,28 +1,37 @@
 module.exports = function(grunt) {
+    require('load-grunt-tasks')(grunt);
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+
+        options : {
+            src: 'src',
+            dest: 'build',
+            temp: '.tmp'
+        },
+        
         watch: {
             scripts: {
-                files: ['src/sf-active-js.js'],
+                files: ['src/js/sf-active-js.js'],
                 tasks: ['jshint', 'uglify:build']
             }
         },
         jshint: {
-            build: ['src/sf-active-js.js']
+            build: ['src/js/sf-active-js.js']
         },
+
         concat: {
             libs: {
                 src: [ 
                        'vendor/jquery-migrate-1.2.1.js',
                        "vendor/history.adapter.jquery.js",
                        "vendor/history.js",
-                       "js/vendor/encoder.js",
+                       "<%= options.src %>/js/vendor/encoder.js",
                        "vendor/mustache.js",
                        "vendor/URI.js",
                        "vendor/json2.js",
                        "vendor/qrcodejs/qrcode.js"
                     ],
-                dest: 'build/libs.js'
+                dest: '<%= options.temp %>/libs.js'
             }
         },
         uglify: {
@@ -30,19 +39,31 @@ module.exports = function(grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             build: {
-                src: 'src/sf-active-js.js',
-                dest: 'js/js/sf-active-js.js'
+                src: '<%= options.src %>/js/sf-active-js.js',
+                dest: '<%= options.dest %>/js/sf-active-js.js'
             },
             libs: {
-                src: 'build/libs.js',
-                dest: 'js/js/libs.js'
+                src: '<%= options.temp %>/libs.js',
+                dest: '<%= options.dest %>/js/libs.js'
             }
         },
         cssmin: {
             build: {
-                src: 'src/main.css',
-                dest: 'js/css/main.css'
+                src: '<%= options.src %>/css/main.css',
+                dest: '<%= options.dest %>/css/main.css'
             }
+        },
+        copy: {
+            build: {
+                files: [
+                    { 
+                        expand: true,
+                        cwd: '<%= options.src %>/',
+                        src: ['index.html','vendor/*','images/*','css/src/*'],
+                        dest: '<%= options.dest %>/'
+                    }
+                ]
+            },
         },
         compress: {
             options: {
@@ -51,7 +72,8 @@ module.exports = function(grunt) {
                 pretty: true
             },
             build: {
-                src: ['js/**/*']
+                src: ['<%= options.dest %>/**/*', '<%= options.dest %>/**/**/*'],
+                dest: './'
             }
         },
         scp: {
@@ -63,19 +85,12 @@ module.exports = function(grunt) {
                 path: '/home/johnk',
             },
             build: {
-                cwd: '/home/johnk/Sites/la.indymedia.org/public/sf-active-js',
+                cwd: '/home/johnk/Sites/la.indymedia.org/public/sf-active-js/<%= options.dest %>',
                 src: 'js.zip', // file to uplload
                 dest: '', // destination directory relative to home root
             }
         }
     });
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-cssmin');
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.loadNpmTasks('grunt-scp');
-    grunt.registerTask('default', ['concat','uglify','cssmin']);
-    grunt.registerTask('release', ['concat','uglify','cssmin', 'compress', 'scp']);
+    grunt.registerTask('default', ['concat','uglify','cssmin','copy']);
+    grunt.registerTask('release', ['concat','uglify','cssmin','copy','compress','scp']);
 };
