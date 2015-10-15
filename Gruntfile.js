@@ -53,13 +53,24 @@ module.exports = function(grunt) {
                 dest: '<%= options.dest %>/css/main.css'
             }
         },
+        htmlmin: {
+            build: {
+                options: {
+                    removeComments: true,
+                    collapseWhitespace: true
+                },
+                files: {
+                    '<%= options.dest %>/index.html': '<%= options.src %>/index.html',
+                }
+            }
+        },
         copy: {
             build: {
                 files: [
                     { 
                         expand: true,
                         cwd: '<%= options.src %>/',
-                        src: ['index.html','vendor/*','images/*','css/src/*'],
+                        src: ['vendor/*','images/*','css/src/*'],
                         dest: '<%= options.dest %>/'
                     }
                 ]
@@ -67,13 +78,17 @@ module.exports = function(grunt) {
         },
         compress: {
             options: {
-                archive: 'js.zip',
-                mode: 'zip',
+                archive: 'js.tgz',
+                mode: 'tgz',
                 pretty: true
             },
             build: {
-                src: ['<%= options.dest %>/**/*', '<%= options.dest %>/**/**/*'],
-                dest: './'
+                files: [{
+                    src: ['**/*'],
+                    cwd: '<%= options.dest %>/',
+                    expand: true,
+                    dest: './'
+                }]
             }
         },
         scp: {
@@ -86,7 +101,7 @@ module.exports = function(grunt) {
             },
             build: {
                 cwd: '/home/johnk/Sites/la.indymedia.org/public/sf-active-js/<%= options.dest %>',
-                src: 'js.zip', // file to uplload
+                src: 'js.tgz', // file to uplload
                 dest: '', // destination directory relative to home root
             }
         }
