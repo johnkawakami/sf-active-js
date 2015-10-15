@@ -104,8 +104,17 @@ module.exports = function(grunt) {
                 src: 'js.tgz', // file to uplload
                 dest: '', // destination directory relative to home root
             }
+        },
+        'http-server': {
+            dev: {
+                root: '<%= options.dest %>', 
+                showDir: true,
+                autoIndex: true,
+                ext: "html",
+            }
         }
     });
     grunt.registerTask('default', ['concat','uglify','cssmin','copy']);
     grunt.registerTask('release', ['concat','uglify','cssmin','copy','compress','scp']);
+    grunt.registerTask('serve', ['default','http-server:dev']);
 };
