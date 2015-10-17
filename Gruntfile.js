@@ -70,7 +70,7 @@ module.exports = function(grunt) {
                     { 
                         expand: true,
                         cwd: '<%= options.src %>/',
-                        src: ['vendor/*','images/*','css/src/*'],
+                        src: ['vendor/*','images/*','css/src/*','*.php','ws/*'],
                         dest: '<%= options.dest %>/'
                     }
                 ]
@@ -100,17 +100,19 @@ module.exports = function(grunt) {
                 path: '/home/johnk',
             },
             build: {
-                cwd: '/home/johnk/Sites/la.indymedia.org/public/sf-active-js/<%= options.dest %>',
+                cwd: '/home/johnk/Sites/la.indymedia.org/public/sf-active-js/',
                 src: 'js.tgz', // file to uplload
                 dest: '', // destination directory relative to home root
             }
         },
         'http-server': {
             dev: {
-                root: '<%= options.dest %>', 
+                root: '<%= options.dest %>/',
+                host: 'indymedia.lo',
                 showDir: true,
                 autoIndex: true,
                 ext: "html",
+                proxy: "http://indymedia.lo",
             }
         }
     });
