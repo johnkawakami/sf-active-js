@@ -26,16 +26,19 @@
  *  2012-09-23, Alex Oss: 
  *		 - replaced string concatonation in numEncode with string builder, push and join for peformance with ammendments by Rob Reid
  */
-
+1;
 (function (root, factory) {
   if (typeof exports === "object" && exports) {
+    console.log("Encoder commonjs");
     factory(exports); // CommonJS
   } else {
     var Encoder = {};
     factory(Encoder);
     if (typeof define === "function" && define.amd) {
+        console.log("Encoder amd");
       define(Encoder); // AMD
     } else {
+        console.log("Encoder script");
       window.Encoder = Encoder; // <script>
     }
   }
@@ -254,4 +257,4 @@
 		return -1;
     };
 
-} ));
+}));

@@ -17,9 +17,14 @@ if (! $csrf->validate_token($csrf_token)) {
     http_error_400("Invalid Form ".$csrf_token);
 }
 
-$author = filter_var($_POST['author'], FILTER_SANITIZE_SPECIAL_CHARS);
-$subject = filter_var($_POST['subject'], FILTER_SANITIZE_SPECIAL_CHARS);
-$text = filter_var($_POST['text'], FILTER_SANITIZE_SPECIAL_CHARS);
+if (get_magic_quotes_gpc()) {
+    foreach($_POST as $k=>$v) {
+        $_POST[$k] = stripslashes($v);
+    }
+}
+$author = $_POST['author'];
+$subject = $_POST['subject'];
+$text = $_POST['text'];
 $parent_id = filter_var($_POST['parent_id'], FILTER_VALIDATE_INT,
     array(
         'options'=>array(

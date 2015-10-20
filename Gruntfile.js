@@ -11,40 +11,69 @@ module.exports = function(grunt) {
         
         watch: {
             scripts: {
-                files: ['src/js/sf-active-js.js'],
+                files: ['src/js/*.js'],
                 tasks: ['jshint', 'uglify:build']
             }
         },
         jshint: {
             build: ['src/js/sf-active-js.js']
         },
-
         concat: {
+            options: {
+                sourceMap: true
+            },
             libs: {
                 src: [ 
                        'vendor/jquery-migrate-1.2.1.js',
                        "vendor/history.adapter.jquery.js",
                        "vendor/history.js",
-                       "<%= options.src %>/js/vendor/encoder.js",
+                       "vendor/encoder.js",
                        "vendor/mustache.js",
                        "vendor/URI.js",
                        "vendor/json2.js",
                        "vendor/qrcodejs/qrcode.js"
                     ],
-                dest: '<%= options.temp %>/libs.js'
+                dest: '<%= options.temp %>/js/libs.js'
+            }
+        },
+        browserify: {
+            options: {
+                browserifyOptions: {
+                    debug: true
+                }
+            },
+            build: {
+                src: '<%= options.src %>/js/*.js',
+                dest: '<%= options.temp %>/js/app.js'
+            },
+        },
+        exorcise: {
+            build: {
+                files: {
+                    '<%= options.temp %>/js/app.js.map':'<%= options.temp %>/js/app.js',
+                }
             }
         },
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                sourceMap: true
             },
             build: {
-                src: '<%= options.src %>/js/sf-active-js.js',
-                dest: '<%= options.dest %>/js/sf-active-js.js'
+                options: {
+                    sourceMapIn: '<%= options.temp %>/js/app.js.map',
+                },
+                files: {
+                    '<%= options.dest %>/js/app.js': '<%= options.temp %>/js/app.js'
+                }
             },
             libs: {
-                src: '<%= options.temp %>/libs.js',
-                dest: '<%= options.dest %>/js/libs.js'
+                options: {
+                    sourceMapIn: '<%= options.temp %>/js/libs.js.map',
+                },
+                files: {
+                    '<%= options.dest %>/js/libs.js': '<%= options.temp %>/js/libs.js'
+                }
             }
         },
         cssmin: {
@@ -116,7 +145,7 @@ module.exports = function(grunt) {
             }
         }
     });
-    grunt.registerTask('default', ['concat','uglify','cssmin','copy']);
-    grunt.registerTask('release', ['concat','uglify','cssmin','copy','compress','scp']);
+    grunt.registerTask('default', ['concat','browserify','exorcise','uglify','cssmin','htmlmin','copy']);
+    grunt.registerTask('release', ['default','compress','scp']);
     grunt.registerTask('serve', ['default','http-server:dev']);
 };
