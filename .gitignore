@@ -2,8 +2,11 @@ build/
 node_modules/
 .settings
 .project
+.tmp/
+js.tgz
 Untitled.*
 jFeed/
 URI/
 js.zip
 .*.swp
+notes.txt
