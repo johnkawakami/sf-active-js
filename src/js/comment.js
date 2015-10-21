@@ -11,11 +11,12 @@ function Comment(editorSel, discloseSel) {
     var commentText;
     var commentAuthor;
     var commentSubmit;
+    var commentAppender = null;
 
     editor = $(editorSel);
     disclose = $(discloseSel);
-    commentSubject = $('<input name="subject" type="text" size="40" placeholder="Subject"/>');
-    commentAuthor = $('<input name="author" type="text" size="20" placeholder="Your Name"/>');
+    commentSubject = $('<input name="subject" type="text" size="40" placeholder="Subject" />');
+    commentAuthor = $('<input name="author" type="text" size="20" placeholder="Your Name" />');
     commentText = $('<textarea placeholder="enter your comment here">');
     commentSubmit = $('<input type="button" value="post" />');
     editor.append('<label>Subject </label><br />');
@@ -35,7 +36,11 @@ function Comment(editorSel, discloseSel) {
         var parts = /\/([0-9]+)\.json$/.exec(url);
         var id = parts[1];
         return parseInt(id);
-    };
+    }
+
+    function setCommentAppender(func) {
+        commentAppender = func;
+    }
 
     function post( evt ) {
         evt.preventDefault(); 
@@ -62,18 +67,16 @@ function Comment(editorSel, discloseSel) {
         console.log(data);
         $.post( url, data,
             function(result) {
-                // try to force a refresh
-                location.reload();
-                // fixme - just get the new json file and insert the new comment.
-                return false;
+                if (commentAppender) {
+                    commentAppender(result);
+                } else {
+                    location.reload();
+                    return false;
+                }
             }, 'json')
-            .done( function() {
-            })
             .fail( function() {
                 alert("Post Failed!");
                 return false;
-            })
-            .always( function() {
             });
         window.localStorage.scrollToBottom = 1;
     };
