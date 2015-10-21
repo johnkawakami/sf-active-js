@@ -118,6 +118,7 @@ function Comment(editorSel, discloseSel) {
     return {
         disableCommentDiscloser: disableCommentDiscloser,
         enableCommentDiscloser: enableCommentDiscloser,
+        setCommentAppender: setCommentAppender,
         hide: hide,
         toggle: toggle,
         clear: clear,
