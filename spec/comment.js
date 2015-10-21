@@ -1,8 +1,7 @@
 
-
-describe("test-me", function() {
+describe("comment", function() {
     it("should add one to the value.", function() {
-        var testMe = new TestMe(1);
+        var comment = new Comment();
         expect(testMe.add(1)).toEqual(2);
     });
 

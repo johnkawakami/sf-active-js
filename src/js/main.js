@@ -1,6 +1,6 @@
 settings = require('./settings.js');
 upArrow = require('./up-arrow.js');
-comment = require('./comment.js');
+Comment = require('./comment.js');
 flag = require('./flag.js');
 embedAudio = require('./embed-audio.js');
 embedVideo = require('./embed-video.js');
@@ -34,7 +34,7 @@ window.IMC.main = function main() {
 	if (cache=="1") {
 		localStorage.rsstime = 0;
 	}
-
+    
     settings.recoverCSS();
 
     layout.init();

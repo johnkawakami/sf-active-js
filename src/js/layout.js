@@ -1,12 +1,13 @@
 
 var upArrow = require('./up-arrow.js');
 var share = require('./share.js');
-var comment = require('./comment.js');
+var Comment = require('./comment.js');
 
 var spinnerCounter = 0;
 var breakingnewsCache = null;
 var featureCache = null;
 var localCache = null;
+var comment;
 
 // display switcher
 var views = { 
@@ -39,9 +40,7 @@ function displayFromQuery() {
             if (values.url) {
                 clearContent();
                 displaySwitcher(values.v);
-                $('#comment-author').val(undefined);
-                $('#comment-subject').val(undefined);
-                $('#comment-text').val(undefined);
+                comment.clear();
                 $.getJSON( getProxyUrl(values.url),
                 function (d) {
                         d.article.numcomments = d.comments.length;
@@ -90,12 +89,14 @@ function displaySwitcher(view) {
     if (view===null || view==="") view='thum';
     console.log(views);
     console.log("switching to " + view);
+    console.log('comment is');
+    console.log(comment);
     for (var v in views) {
         if (v == view) {
             $(views[v][0]).css('display', 'block');
             $(document).attr('title', views[v][1]);
             $('#header-title').html(views[v][1]);
-            comment.hideCommentForm();
+            comment.hide();
             if (v=='cont' || v=='publ') {
                 comment.enableCommentDiscloser();
             } else {
@@ -341,6 +342,7 @@ function insertStory(d) {
 function insertAttachments(d) {
     var att = $('#attachments');
     var i = 0;
+    var comment;
     var template = '<div id="article-{{i}}" class="article"><h2>{{heading}}</h2><p class="byline">by {{{author}}}<br />{{{format_created}}}</p><p><a href="{{{image.original}}}"><img src="{{{image.medium}}}" class="photo" /></a></p><p>{{{article}}}</p>';
     att.html(''); // clear them
     d.forEach( 
@@ -376,6 +378,7 @@ function insertAttachments(d) {
 
 // fixme - comments don't have images. they can have images.
 function insertComments(d) {
+    var comment;
     var commentTemplate = '<div id="article-{{i}}" class="comment"><h2>{{{heading}}}</h2><p>by {{{author}}}<br />{{{format_created}}}</p>{{{attachment}}}{{{article}}}<p><a href="{{{link}}}">{{{link}}}</a></p></div>';
     var comm = $('#comments');
     comm.html(''); // clear it out
@@ -507,6 +510,11 @@ function getProxyUrl(url) {
 
 function init() {
     console.log('in layout.init');
+    // attach the comment form
+    comment = Comment('#editor', '#disclose');
+    console.log('just created comment');
+    console.log(comment);
+
     $('#thumbscreenbutton').on('click',function(){History.back();});
     $('#blocal'   ).on('click',function(){History.pushState(null,"local","?v=loca");});
     $('#bbreaking').on('click',function(){History.pushState(null,"breaking news","?v=brea");});
@@ -514,9 +522,6 @@ function init() {
     $('#bfeatures').on('click',function(){History.pushState(null,"features","?v=feat");});
     $('#bpublish' ).on('click',function(){History.pushState(null,"publish","?v=publ");});
     $('#blatestcomments' ).on('click',function(){History.pushState(null,"latest comments","?v=comm");});
-    // comment form
-    $('#add-comment-button' ).on('click', function(evt){comment.postComment(evt); return false;});
-    $('#disclose').on('click',function(){comment.toggleCommentForm();});
     // settings form elements
     $('#settings-close').on('click',function(){return closeSettings();});
     $('#settings-open').on('click',function(){return openSettings();});

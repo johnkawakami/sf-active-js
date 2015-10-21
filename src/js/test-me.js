@@ -38,3 +38,11 @@ module.exports = TestMe;
  * To use this in the testing environment, you do this.
  * var testMe = new TestMe(1);
  */
+
+/* This code below is attached to the global IMC namespace */
+
+IMC.testMe = {
+    add: function(z) {
+        return z + 1;
+    }
+};
