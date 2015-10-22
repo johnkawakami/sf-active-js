@@ -52,7 +52,7 @@ function Comment(editorSel, discloseSel) {
 
         if (subject==='' || text==='' || author==='') {
             alert("No empty fields allowed");
-            return;
+            return false;
         }
         var csrf_token = editor.attr('data-csrf-token');
 
@@ -79,10 +79,10 @@ function Comment(editorSel, discloseSel) {
                 return false;
             });
         window.localStorage.scrollToBottom = 1;
+        return false;
     };
 
     function hide() {
-        var editor = $('#editor');
         editor.hide(0);
         disclose.html('&#9654; Add Comment');
     };
@@ -103,12 +103,12 @@ function Comment(editorSel, discloseSel) {
     };
 
     function disableCommentDiscloser() {
-        editor.addClass('hidden');
-        disclose.addClass('hidden');
+        editor.hide();
+        disclose.hide();
     };
 
     function enableCommentDiscloser() {
-        disclose.removeClass('hidden');
+        disclose.show();
     };
     function clear() {
         commentAuthor.val(undefined);
@@ -122,7 +122,10 @@ function Comment(editorSel, discloseSel) {
         hide: hide,
         toggle: toggle,
         clear: clear,
-        post: post
+        post: post,
+        setAuthor: function setAuthor(t) { commentAuthor.val(t); },
+        setSubject: function setSubject(t) { commentSubject.val(t); },
+        setText: function setText(t) { commentText.val(t); }
     };
 }
 module.exports = Comment;

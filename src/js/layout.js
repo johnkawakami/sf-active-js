@@ -512,7 +512,6 @@ function init() {
     console.log('in layout.init');
     // attach the comment form
     comment = Comment('#editor', '#disclose');
-    console.log('just created comment');
     console.log(comment);
 
     $('#thumbscreenbutton').on('click',function(){History.back();});
@@ -538,7 +537,7 @@ function init() {
     // attach state handlers for history
     History.Adapter.bind(window, 'statechange', displayFromQuery);
 
-    $('#editor').hide(0);
+    comment.hide();
 
     displayFromQuery();
 
