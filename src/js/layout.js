@@ -355,21 +355,26 @@ function insertAttachments(d) {
                 a.author = matches[1];
                 a.article = a.article.replace( /^by .*$/m, '' );
             }
-            if (! a.image.medium) { 
+            if ((a.image) && (! a.image.medium)) { 
                 a.image.medium = a.image.original;
             }
             var text = Mustache.render( template, a );
 
-            comment = $.parseHTML( text );
+            comment = $($.parseHTML( text ));
+
+	    if (/audio/.test(a.mime_type)) {
+		comment.append('<p><audio controls><source src="'+a.fileurl+'" type="'+a.mime_type+'"></audio></p>');
+	    } 
+
             // create some buttons
             $('<div/>', { class:'disc' }).append(
                 a = $('<span/>', { class:'disc-btn', text:'reply' }),
                 b = $('<span/>', { class:'disc-btn', html:'<span class="icon flagbutton"></span>' }),
                 c = $('<span/>', { class:'disc-btn', html:'<span class="icon likebutton"></span>' })
-            ).appendTo( $(comment) );
-            a.click(makeOpenReplyHandler(d.id,x));
-            b.click(makeOpenFlagHandler(d.id,x));
-            c.click(makeOpenLikeHandler(d.id,x));
+            ).appendTo( comment );
+            a.click(makeOpenReplyHandler(d.id));
+            b.click(makeOpenFlagHandler(d.id));
+            c.click(makeOpenLikeHandler(d.id));
 
             att.append( comment );
         }
@@ -396,13 +401,16 @@ function insertComments(d) {
         data.author = Encoder.htmlDecode(data.author);
         var text = Mustache.render(commentTemplate, data );
 
-        comment = $.parseHTML( text );
+        comment = $($.parseHTML( text ));
+	if (/audio/.test(data.mime_type)) {
+	   comment.append('<p><audio controls><source src="'+data.fileurl+'" type="'+data.mime_type+'"></audio></p>');
+	} 
         // create some buttons
         $('<div/>', { class:'disc' }).append(
           a = $('<span/>', { class:'disc-btn', text:'reply' }),
           b = $('<span/>', { class:'disc-btn', text:'flag' }),
           c = $('<span/>', { class:'disc-btn', text:'like' })
-        ).appendTo( $(comment) );
+        ).appendTo( comment );
         a.click( makeOpenReplyHandler(d.id) );
         b.click( makeOpenFlagHandler(d.id) );
         c.click( makeOpenLikeHandler(d.id) );
