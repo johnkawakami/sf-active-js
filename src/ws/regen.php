@@ -31,8 +31,8 @@ if ( $_SERVER['HTTP_HOST'] == 'indymedia.lo' ) {
 	$sf_active_config_path = "/home/johnk/Sites/la.indymedia.org/local/config/sfactive.cfg";
 	$cache_path = '/tmp/json/';
 } else {
-	$sf_active_config_path = "/www/la.indymedia.org/local/config/sfactive.cfg";
-	$cache_path = '/www/la.indymedia.org/local/cache/';
+	$sf_active_config_path = "/opt/docker/apache/www/la.indymedia.org/local/config/sfactive.cfg";
+	$cache_path = '/opt/docker/imc-la/cache/';
 }
 $upload_root = array();
 $upload_root[] = '/mnt/ad3/usr/local/www-domains/la.indymedia.org/public/uploads';

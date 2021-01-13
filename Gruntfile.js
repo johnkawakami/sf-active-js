@@ -120,20 +120,6 @@ module.exports = function(grunt) {
                 }]
             }
         },
-        scp: {
-            options: {
-                host: 'slaptech.net',
-                port: 2222,
-                username: 'johnk',
-                privateKey: grunt.file.read('/home/johnk/.ssh/id_rsa'),
-                path: '/home/johnk',
-            },
-            build: {
-                cwd: '/home/johnk/Sites/la.indymedia.org/public/sf-active-js/',
-                src: 'js.tgz', // file to uplload
-                dest: '', // destination directory relative to home root
-            }
-        },
         'http-server': {
             dev: {
                 root: '<%= options.dest %>/',
@@ -146,6 +132,6 @@ module.exports = function(grunt) {
         }
     });
     grunt.registerTask('default', ['concat','browserify','exorcise','uglify','cssmin','htmlmin','copy']);
-    grunt.registerTask('release', ['default','compress','scp']);
+    grunt.registerTask('release', ['default','compress']);
     grunt.registerTask('serve', ['default','http-server:dev']);
 };

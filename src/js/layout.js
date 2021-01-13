@@ -114,7 +114,7 @@ function displaySwitcher(view) {
 //
 function makeUrlClickHandler(url, scrollToBottom) {
     return function() { 
-        History.pushState(null,"local","?v=cont&stb=" + scrollToBottom + "&url=http://la.indymedia.org" + url); 
+        History.pushState(null,"local","?v=cont&stb=" + scrollToBottom + "&url=https://la.indymedia.org" + url); 
     };
 }
 
@@ -135,7 +135,7 @@ function formatArticleList(prefix, json, scrollToBottom) {
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];
-		html += '<li id="'+prefix+'-id-'+j.id+'" class="noselect"><a href="?v=cont&stb='+scrollToBottom+'&url=http://la.indymedia.org' +
+		html += '<li id="'+prefix+'-id-'+j.id+'" class="noselect"><a href="?v=cont&stb='+scrollToBottom+'&url=https://la.indymedia.org' +
 		j.url + 
         '">' + 
         j.title + 
@@ -163,7 +163,7 @@ function formatCalendarList(json) {
 	  var html = '<ul class="articlelist">';
 	  for(var i = 0; i < json.length ; i++) {
 	  	j = json[i];
-			html += '<li id="calendar-id-'+j.id+'" class="noselect"><a href="?v=cont&url=http://la.indymedia.org' +
+			html += '<li id="calendar-id-'+j.id+'" class="noselect"><a href="?v=cont&url=https://la.indymedia.org' +
 			j.url + '">' + j.title + '</a>' + "<br />&nbsp;<span class='eventdate'>" + j.start + '</span></li>';
 	  }
 	  html = html + '</ul>';	
@@ -194,7 +194,7 @@ function openFlag(id,ev) {
     var f = $('#flag');
     var ajaxSubmitFlag = function (id, reason) {
         return function() {
-            $.getJSON( 'http://la.indymedia.org/qc/report.php?id='+id+'&q='+reason+'&format=json&callback=?',
+            $.getJSON( 'https://la.indymedia.org/qc/report.php?id='+id+'&q='+reason+'&format=json&callback=?',
                 function( data ) {			
                     if (data.moderatorScore) {
                         alert( "Thank you.  Your mod score is " + data.moderatorScore );
@@ -452,7 +452,7 @@ function headlineLoader(j) {
     // insert the images if they exist
     function insertFeaturePreview(i) {
         var featElement = $('#id-' + feature[i].id);
-        $.getJSON(getProxyUrl('http://la.indymedia.org'+feature[i].url), function(data) {
+        $.getJSON(getProxyUrl('https://la.indymedia.org'+feature[i].url), function(data) {
             var image = $('<img>');
             image.load(function(){
                 featElement.prepend($('<br>'));
@@ -476,7 +476,7 @@ function headlineLoader(j) {
 */
 /* 
 $.getJSON(
-    'http://la.indymedia.org/js/ws/regen.php?callback=?',
+    'https://la.indymedia.org/js/ws/regen.php?callback=?',
     { "s":"combined" },
     headlineLoader,
     function (j) {
@@ -552,7 +552,7 @@ function init() {
     $('#publish').append('publish');
 
     $.getJSON(
-        getProxyUrl("http://la.indymedia.org/js/ws/regen.php"),
+        getProxyUrl("https://la.indymedia.org/js/ws/regen.php"),
         headlineLoader,
         function (j) {
             console.log("some kind of error happened");
