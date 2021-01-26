@@ -10,7 +10,9 @@ if (!$id) { // id must be present
 	exit;
 }
 
-$db_obj = new DB;
+include_once('../../shared/classes/SFACTIVE/DB.php');
+
+$db_obj = new SFACTIVE\DB;
 $query = "SELECT created FROM webcast WHERE id=".$id;
 $result = $db_obj->query($query);
 $article = array_pop($result);
